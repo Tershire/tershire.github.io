@@ -9,6 +9,7 @@ export interface Artist {
   color: string;
   accent: string;
   keyWorks: string[];
+  image?: string;  // path under /public, e.g. '/images/artists/radiohead.jpg'
 }
 
 export const favoriteArtists: Artist[] = [

@@ -6,7 +6,8 @@ export const SITE = {
   email: 'tershire@gmail.com',
   github: 'https://github.com/tershire',
   profileImage: '/images/profile.jpg',
-  homeBg: '/images/home-bg.jpg',
+  homeBg: '/images/home-bg.png',
+  homeBgDark: '/images/home-bg-dark.png',
 };
 
 export const NAV_LINKS = [

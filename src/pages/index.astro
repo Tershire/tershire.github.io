@@ -69,8 +69,10 @@ import { SITE, NAV_LINKS } from '../data/site';
     <img
       id="home-bg"
       src={SITE.homeBg}
+      data-light={SITE.homeBg}
+      data-dark={SITE.homeBgDark ?? SITE.homeBg}
       alt=""
-      style="width:100%;height:100%;object-fit:cover;"
+      style="width:100%;height:100%;object-fit:cover;transition:opacity 0.4s;"
     />
     <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1e293b,#334155,#475569);"></div>
     <div style="position:absolute;inset:0;background:rgba(0,0,0,0.25);"></div>
@@ -250,20 +252,29 @@ import { SITE, NAV_LINKS } from '../data/site';
   }
 
   // Theme toggle
-  function syncHomeIcons() {
+  function syncHomeState() {
     const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+    // Icons
     const sun = document.getElementById('home-icon-sun') as HTMLElement;
     const moon = document.getElementById('home-icon-moon') as HTMLElement;
     if (sun) sun.style.display = dark ? 'block' : 'none';
     if (moon) moon.style.display = dark ? 'none' : 'block';
+
+    // Background image
+    const bg = document.getElementById('home-bg') as HTMLImageElement | null;
+    if (bg) {
+      const target = dark ? (bg.dataset.dark ?? bg.dataset.light) : bg.dataset.light;
+      if (target && bg.src !== new URL(target, location.href).href) bg.src = target;
+    }
   }
 
   document.getElementById('home-theme-toggle')?.addEventListener('click', () => {
     const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
     localStorage.setItem('theme', next);
-    syncHomeIcons();
+    syncHomeState();
   });
 
-  syncHomeIcons();
+  syncHomeState();
 </script>

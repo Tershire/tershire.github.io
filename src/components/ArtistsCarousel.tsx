@@ -65,15 +65,28 @@ function ArtistTile({ artist }: { artist: Artist }) {
         transform: hovered ? 'translateY(-4px)' : 'none',
       }}
     >
-      {/* Colored header with flag */}
-      <div style={{ height: '90px', background: artist.color, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
-        <span style={{ fontSize: '2.75rem', lineHeight: 1 }}>{artist.flag}</span>
+      {/* Image header — photo if set, colored placeholder if not */}
+      <div style={{ height: '120px', background: artist.color, overflow: 'hidden', position: 'relative', flexShrink: 0 }}>
+        {artist.image ? (
+          <img
+            src={artist.image}
+            alt={artist.name}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top', transition: 'transform 0.3s', transform: hovered ? 'scale(1.05)' : 'scale(1)' }}
+          />
+        ) : (
+          <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <svg width="36" height="36" fill="none" viewBox="0 0 24 24" stroke={artist.accent} strokeWidth={1.25} style={{ opacity: 0.45 }}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 9l10.5-3m0 6.553v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 11-.99-3.467l2.31-.66a2.25 2.25 0 001.632-2.163zm0 0V2.25L9 5.25v10.303m0 0v3.75a2.25 2.25 0 01-1.632 2.163l-1.32.377a1.803 1.803 0 01-.99-3.467l2.31-.66A2.25 2.25 0 009 15.553z" />
+            </svg>
+          </div>
+        )}
       </div>
 
       {/* Content */}
       <div style={{ padding: '1rem' }}>
         <p style={{ fontSize: '0.6875rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em', color: artist.accent, margin: '0 0 0.25rem' }}>{artist.genre}</p>
-        <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text)', margin: '0 0 0.375rem', lineHeight: 1.2 }}>{artist.name}</h3>
+        <h3 style={{ fontSize: '1rem', fontWeight: 700, color: 'var(--color-text)', margin: '0 0 0.1875rem', lineHeight: 1.2 }}>{artist.name}</h3>
+        <p style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', margin: '0 0 0.375rem' }}>{artist.flag} {artist.country}</p>
         <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', margin: '0 0 0.875rem', lineHeight: 1.5 }}>{artist.description}</p>
 
         {/* Key works */}
