@@ -1,0 +1,53 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import ArtistsCarousel from '../../../components/ArtistsCarousel';
+import MusicReviewsGrid from '../../../components/MusicReviewsGrid';
+import { getCollection } from 'astro:content';
+import { favoriteArtists } from '../../../data/music';
+
+const entries = await getCollection('music');
+const reviews = entries.map(e => ({
+  slug: e.id,
+  ...e.data,
+})).sort((a, b) => new Date(b.releaseDate).valueOf() - new Date(a.releaseDate).valueOf());
+---
+
+<BaseLayout title="Music" description="Artists I love and albums worth writing about.">
+  <div class="page-container py-16">
+
+    <!-- Page header -->
+    <div style="margin-bottom:3rem;">
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;">
+        <div style="width:3px;height:2rem;background:linear-gradient(180deg,var(--color-accent),var(--color-accent-light));border-radius:9999px;"></div>
+        <p style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-text-muted);margin:0;">Interests</p>
+      </div>
+      <h1 class="section-title">Music</h1>
+      <p class="section-subtitle" style="max-width:42rem;">
+        Artists I keep coming back to, and occasional thoughts on records worth sitting with.
+      </p>
+    </div>
+
+    <!-- Favorites section -->
+    <div style="margin-bottom:3.5rem;">
+      <h2 style="font-size:1.125rem;font-weight:700;color:var(--color-text);margin:0 0 1.25rem;display:flex;align-items:center;gap:0.625rem;">
+        <span>Favorites</span>
+        <span style="font-size:0.75rem;font-weight:500;color:var(--color-text-muted);padding:0.15rem 0.625rem;background:var(--color-code-bg);border-radius:9999px;">
+          {favoriteArtists.length} artists
+        </span>
+      </h2>
+      <ArtistsCarousel artists={favoriteArtists} client:load />
+    </div>
+
+    <!-- Reviews section -->
+    <div>
+      <h2 style="font-size:1.125rem;font-weight:700;color:var(--color-text);margin:0 0 1.5rem;display:flex;align-items:center;gap:0.625rem;">
+        <span>Reviews</span>
+        <span style="font-size:0.75rem;font-weight:500;color:var(--color-text-muted);padding:0.15rem 0.625rem;background:var(--color-code-bg);border-radius:9999px;">
+          {reviews.length} entries
+        </span>
+      </h2>
+      <MusicReviewsGrid reviews={reviews} client:load />
+    </div>
+
+  </div>
+</BaseLayout>

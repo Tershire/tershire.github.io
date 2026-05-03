@@ -1,0 +1,73 @@
+---
+import { getCollection, render } from 'astro:content';
+import ArticleLayout from '../../../layouts/ArticleLayout.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('music');
+  return entries.map(entry => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+
+const releaseYear = new Date(entry.data.releaseDate).getFullYear();
+const releaseFormatted = new Date(entry.data.releaseDate).toLocaleDateString('en-US', {
+  year: 'numeric', month: 'long', day: 'numeric',
+});
+---
+
+<ArticleLayout
+  title={`${entry.data.title} — ${entry.data.artist}`}
+  description={entry.data.description}
+  tags={entry.data.tags}
+>
+  <div style="margin-bottom:2.5rem;">
+    <a href="/interests/music" style="display:inline-flex;align-items:center;gap:0.375rem;font-size:0.875rem;color:var(--color-text-muted);text-decoration:none;transition:color 0.15s;" class="back-link">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+      </svg>
+      Music
+    </a>
+  </div>
+
+  <!-- Record header -->
+  <div style="margin-bottom:2.5rem;padding:1.75rem;background:var(--color-card);border:1px solid var(--color-border);border-radius:1.25rem;">
+    <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.75rem;flex-wrap:wrap;">
+      <span style={`padding:0.15rem 0.625rem;border-radius:9999px;font-size:0.6875rem;font-weight:600;background:${entry.data.color ?? 'var(--color-code-bg)'};color:${entry.data.accent ?? 'var(--color-accent)'};`}>
+        {entry.data.type.charAt(0).toUpperCase() + entry.data.type.slice(1)}
+      </span>
+      <span style="font-size:0.875rem;color:var(--color-text-muted);">{entry.data.flag} {entry.data.country} · {releaseYear}</span>
+      {entry.data.rating && (
+        <span style="display:inline-flex;gap:2px;align-items:center;">
+          {Array.from({ length: 5 }, (_, i) => (
+            <span style={`font-size:0.5rem;color:${i < entry.data.rating! ? 'var(--color-accent)' : 'var(--color-border)'};`}>●</span>
+          ))}
+        </span>
+      )}
+    </div>
+
+    <h1 style="font-size:1.75rem;font-weight:800;color:var(--color-text);margin:0 0 0.25rem;line-height:1.15;">{entry.data.title}</h1>
+    <p style="font-size:1.125rem;font-weight:600;color:var(--color-accent);margin:0 0 1rem;">{entry.data.artist}</p>
+
+    {entry.data.description && (
+      <p style="font-size:1rem;color:var(--color-text-muted);line-height:1.65;margin:0 0 1.25rem;">{entry.data.description}</p>
+    )}
+
+    <div style="display:flex;flex-wrap:wrap;gap:0.375rem;">
+      {entry.data.tags.map((tag: string) => (
+        <span style="padding:0.2rem 0.625rem;background:var(--color-code-bg);color:var(--color-text-muted);border:1px solid var(--color-border);border-radius:9999px;font-size:0.6875rem;">{tag}</span>
+      ))}
+    </div>
+
+    <p style="font-size:0.75rem;color:var(--color-text-muted);margin:1rem 0 0;">Released {releaseFormatted}</p>
+  </div>
+
+  <Content />
+</ArticleLayout>
+
+<style>
+  .back-link:hover { color: var(--color-accent) !important; }
+</style>

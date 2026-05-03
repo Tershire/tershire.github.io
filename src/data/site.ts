@@ -26,6 +26,13 @@ export const NAV_LINKS = [
     ],
   },
   {
+    label: 'Interests',
+    href: '/interests/music',
+    children: [
+      { label: 'Music', href: '/interests/music' },
+    ],
+  },
+  {
     label: 'Hobbies',
     href: '/hobbies',
     children: [],

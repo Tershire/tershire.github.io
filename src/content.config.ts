@@ -35,4 +35,22 @@ const hobbies = defineCollection({
   }),
 });
 
-export const collections = { blog, projects, hobbies };
+const music = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/music' }),
+  schema: z.object({
+    title: z.string(),
+    artist: z.string(),
+    type: z.enum(['album', 'EP', 'single', 'track', 'compilation']),
+    releaseDate: z.string(),
+    country: z.string(),
+    countryCode: z.string(),
+    flag: z.string(),
+    description: z.string().optional(),
+    rating: z.number().min(1).max(5).optional(),
+    tags: z.array(z.string()).default([]),
+    color: z.string().optional(),
+    accent: z.string().optional(),
+  }),
+});
+
+export const collections = { blog, projects, hobbies, music };
