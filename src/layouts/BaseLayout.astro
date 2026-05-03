@@ -43,6 +43,17 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:type" content="website" />
     {image && <meta property="og:image" content={image} />}
 
+    <!-- Prevent flash of wrong theme: apply saved theme before first paint -->
+    <script is:inline>
+      (function () {
+        const saved = localStorage.getItem('theme');
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (saved === 'dark' || (!saved && prefersDark)) {
+          document.documentElement.setAttribute('data-theme', 'dark');
+        }
+      })();
+    </script>
+
     <!-- KaTeX for math rendering -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66pr4hX" crossorigin="anonymous" />
 
@@ -62,15 +73,19 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 
     <!-- Footer -->
     {!noNav && (
-      <footer class="border-t border-[var(--color-border)] py-10 mt-20">
-        <div class="page-container flex flex-col md:flex-row items-center justify-between gap-4 text-sm text-[var(--color-text-muted)]">
-          <p>© {new Date().getFullYear()} {SITE.author}. All rights reserved.</p>
-          <div class="flex items-center gap-4">
-            <a href={SITE.github} target="_blank" rel="noopener" class="hover:text-[var(--color-accent)] transition-colors">GitHub</a>
-            <a href={`mailto:${SITE.email}`} class="hover:text-[var(--color-accent)] transition-colors">Email</a>
+      <footer style="border-top:1px solid var(--color-border);padding:2.5rem 0;margin-top:5rem;">
+        <div class="page-container" style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:1rem;font-size:0.875rem;color:var(--color-text-muted);">
+          <p style="margin:0;">© {new Date().getFullYear()} {SITE.author}. All rights reserved.</p>
+          <div style="display:flex;align-items:center;gap:1.25rem;">
+            <a href={SITE.github} target="_blank" rel="noopener" style="color:var(--color-text-muted);text-decoration:none;transition:color 0.15s;" class="footer-link">GitHub</a>
+            <a href={`mailto:${SITE.email}`} style="color:var(--color-text-muted);text-decoration:none;transition:color 0.15s;" class="footer-link">Email</a>
           </div>
         </div>
       </footer>
     )}
+
+    <style>
+      .footer-link:hover { color: var(--color-accent) !important; }
+    </style>
   </body>
 </html>
