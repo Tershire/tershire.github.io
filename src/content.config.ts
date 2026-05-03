@@ -1,4 +1,5 @@
-import { defineCollection, z } from 'astro:content';
+import { defineCollection } from 'astro:content';
+import { z } from 'zod';
 import { glob } from 'astro/loaders';
 
 const blog = defineCollection({
@@ -13,4 +14,25 @@ const blog = defineCollection({
   }),
 });
 
-export const collections = { blog };
+const projects = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/projects' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    date: z.string().optional(),
+    tags: z.array(z.string()).default([]),
+    image: z.string().optional(),
+  }),
+});
+
+const hobbies = defineCollection({
+  loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/hobbies' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string().optional(),
+    tags: z.array(z.string()).default([]),
+    image: z.string().optional(),
+  }),
+});
+
+export const collections = { blog, projects, hobbies };

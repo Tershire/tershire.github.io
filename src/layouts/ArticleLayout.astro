@@ -19,44 +19,37 @@ const formattedDate = date
 
 <BaseLayout title={title} description={description} image={image}>
   <!-- Reading progress bar -->
-  <div
-    id="reading-progress"
-    style="position:fixed;top:52px;left:0;right:0;height:3px;background:rgba(0,0,0,0.06);z-index:49;"
-  >
-    <div
-      id="reading-progress-bar"
-      style="height:100%;width:0%;background:linear-gradient(90deg,#4f7cac,#7aa3cc);transition:width 0.1s linear;"
-    ></div>
+  <div id="reading-progress" style="position:fixed;top:52px;left:0;right:0;height:3px;background:rgba(0,0,0,0.06);z-index:49;">
+    <div id="reading-progress-bar" style="height:100%;width:0%;background:linear-gradient(90deg,var(--color-accent),var(--color-accent-light));transition:width 0.1s linear;"></div>
   </div>
 
   <div style="max-width:1200px;margin:0 auto;padding:3rem 1.5rem 5rem;">
-    <div style="display:grid;grid-template-columns:1fr 260px;gap:4rem;align-items:start;position:relative;" id="article-grid">
+    <div style="display:grid;grid-template-columns:1fr 260px;gap:4rem;align-items:start;" id="article-grid">
 
       <!-- Article content -->
       <article>
-        <!-- Header -->
         <header style="margin-bottom:3rem;">
           {tags.length > 0 && (
             <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1rem;">
               {tags.map(tag => (
-                <span style="padding:0.2rem 0.75rem;background:#eff6ff;color:#1d4ed8;border-radius:9999px;font-size:0.75rem;font-weight:500;">
+                <span style="padding:0.2rem 0.75rem;background:rgba(79,124,172,0.12);color:var(--color-accent);border-radius:9999px;font-size:0.75rem;font-weight:500;">
                   {tag}
                 </span>
               ))}
             </div>
           )}
 
-          <h1 style="font-size:2.5rem;font-weight:800;line-height:1.2;margin:0 0 1rem;letter-spacing:-0.02em;color:#111827;">
+          <h1 style="font-size:2.5rem;font-weight:800;line-height:1.2;margin:0 0 1rem;letter-spacing:-0.02em;color:var(--color-text);">
             {title}
           </h1>
 
           {description && (
-            <p style="font-size:1.125rem;color:#6b7280;line-height:1.6;margin:0 0 1.5rem;">
+            <p style="font-size:1.125rem;color:var(--color-text-muted);line-height:1.6;margin:0 0 1.5rem;">
               {description}
             </p>
           )}
 
-          <div style="display:flex;align-items:center;gap:1.5rem;color:#9ca3af;font-size:0.875rem;padding-top:1.25rem;border-top:1px solid #f0f0ec;">
+          <div style="display:flex;align-items:center;gap:1.5rem;color:var(--color-text-muted);font-size:0.875rem;padding-top:1.25rem;border-top:1px solid var(--color-border);">
             {formattedDate && (
               <span style="display:flex;align-items:center;gap:0.375rem;">
                 <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -82,33 +75,28 @@ const formattedDate = date
           </div>
         )}
 
-        <!-- Prose content -->
         <div class="prose" id="article-content">
           <slot />
         </div>
       </article>
 
       <!-- Sticky TOC sidebar -->
-      <aside
-        id="toc-sidebar"
-        style="position:sticky;top:calc(52px + 2rem);max-height:calc(100vh - 52px - 4rem);overflow-y:auto;"
-      >
-        <div style="background:white;border:1px solid #e5e5e0;border-radius:1rem;padding:1.25rem;">
-          <!-- Progress ring/bar -->
+      <aside id="toc-sidebar" style="position:sticky;top:calc(52px + 2rem);max-height:calc(100vh - 52px - 4rem);overflow-y:auto;">
+        <div style="background:var(--color-card);border:1px solid var(--color-border);border-radius:1rem;padding:1.25rem;backdrop-filter:blur(8px);">
+          <!-- Progress -->
           <div style="margin-bottom:1rem;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
-              <span style="font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#9ca3af;">Progress</span>
-              <span id="toc-progress-text" style="font-size:0.75rem;font-weight:600;color:#4f7cac;">0%</span>
+              <span style="font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-text-muted);">Progress</span>
+              <span id="toc-progress-text" style="font-size:0.75rem;font-weight:600;color:var(--color-accent);">0%</span>
             </div>
-            <div style="height:4px;background:#f3f4f6;border-radius:9999px;overflow:hidden;">
-              <div id="toc-progress-fill" style="height:100%;width:0%;background:linear-gradient(90deg,#4f7cac,#7aa3cc);border-radius:9999px;transition:width 0.15s;"></div>
+            <div style="height:4px;background:var(--color-code-bg);border-radius:9999px;overflow:hidden;">
+              <div id="toc-progress-fill" style="height:100%;width:0%;background:linear-gradient(90deg,var(--color-accent),var(--color-accent-light));border-radius:9999px;transition:width 0.15s;"></div>
             </div>
           </div>
 
-          <p style="font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:#9ca3af;margin:0 0 0.75rem;">On this page</p>
-
+          <p style="font-size:0.6875rem;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-text-muted);margin:0 0 0.75rem;">On this page</p>
           <nav id="toc-nav">
-            <p style="font-size:0.8125rem;color:#9ca3af;">Loading...</p>
+            <p style="font-size:0.8125rem;color:var(--color-text-muted);">Loading...</p>
           </nav>
         </div>
       </aside>
@@ -117,7 +105,6 @@ const formattedDate = date
 </BaseLayout>
 
 <script>
-  // Build TOC from headings
   function buildToc() {
     const content = document.getElementById('article-content');
     const tocNav = document.getElementById('toc-nav');
@@ -125,11 +112,10 @@ const formattedDate = date
 
     const headings = Array.from(content.querySelectorAll('h2, h3, h4'));
     if (headings.length === 0) {
-      tocNav.innerHTML = '<p style="font-size:0.8125rem;color:#9ca3af;">No sections found.</p>';
+      tocNav.innerHTML = '<p style="font-size:0.8125rem;color:var(--color-text-muted)">No sections found.</p>';
       return;
     }
 
-    // Ensure each heading has an id
     headings.forEach((h, i) => {
       if (!h.id) {
         h.id = 'heading-' + i + '-' + h.textContent!.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
@@ -146,12 +132,13 @@ const formattedDate = date
       a.href = '#' + h.id;
       a.dataset.headingId = h.id;
       a.textContent = h.textContent!;
+      a.className = 'toc-link';
       a.style.cssText = `
         display:block;
         padding:0.3rem 0.5rem;
         font-size:${level === 2 ? '0.8125rem' : '0.75rem'};
         font-weight:${level === 2 ? '500' : '400'};
-        color:#6b7280;
+        color:var(--color-text-muted);
         text-decoration:none;
         border-radius:0.375rem;
         margin-left:${(level - 2) * 0.875}rem;
@@ -161,13 +148,13 @@ const formattedDate = date
       `;
       a.addEventListener('mouseenter', () => {
         if (!a.classList.contains('toc-active')) {
-          a.style.color = '#374151';
-          a.style.background = '#f9fafb';
+          a.style.color = 'var(--color-text)';
+          a.style.background = 'var(--color-code-bg)';
         }
       });
       a.addEventListener('mouseleave', () => {
         if (!a.classList.contains('toc-active')) {
-          a.style.color = '#6b7280';
+          a.style.color = 'var(--color-text-muted)';
           a.style.background = '';
         }
       });
@@ -179,7 +166,6 @@ const formattedDate = date
     tocNav.appendChild(ul);
   }
 
-  // Reading progress + TOC active state
   function setupProgress() {
     const progressBar = document.getElementById('reading-progress-bar');
     const tocProgressFill = document.getElementById('toc-progress-fill');
@@ -195,26 +181,24 @@ const formattedDate = date
       if (tocProgressFill) tocProgressFill.style.width = pct + '%';
       if (tocProgressText) tocProgressText.textContent = pct + '%';
 
-      // Highlight active heading
       if (!content) return;
       const headings = Array.from(content.querySelectorAll('h2[id],h3[id],h4[id]'));
       let activeId = '';
       for (const h of headings) {
-        const rect = h.getBoundingClientRect();
-        if (rect.top <= 80) activeId = h.id;
+        if (h.getBoundingClientRect().top <= 80) activeId = h.id;
       }
 
       document.querySelectorAll('#toc-nav a').forEach(a => {
         const el = a as HTMLAnchorElement;
         if (el.dataset.headingId === activeId) {
           el.classList.add('toc-active');
-          el.style.color = '#4f7cac';
+          el.style.color = 'var(--color-accent)';
           el.style.fontWeight = '600';
-          el.style.borderLeftColor = '#4f7cac';
-          el.style.background = '#eff6ff';
+          el.style.borderLeftColor = 'var(--color-accent)';
+          el.style.background = 'rgba(79,124,172,0.1)';
         } else {
           el.classList.remove('toc-active');
-          el.style.color = '#6b7280';
+          el.style.color = 'var(--color-text-muted)';
           el.style.fontWeight = '';
           el.style.borderLeftColor = 'transparent';
           el.style.background = '';
@@ -226,7 +210,6 @@ const formattedDate = date
     update();
   }
 
-  // Responsive: hide TOC on small screens
   function handleResize() {
     const sidebar = document.getElementById('toc-sidebar');
     const grid = document.getElementById('article-grid');

@@ -1,0 +1,63 @@
+---
+title: "Neural Occupancy Mapping"
+description: "Real-time 3D occupancy mapping using implicit neural representations with uncertainty estimation."
+date: "2023-06-01"
+tags: ["Neural Networks", "NeRF", "Python", "PyTorch", "Mapping"]
+---
+
+Classical occupancy grid maps are fast and predictable, but they discretize space into fixed-resolution voxels and discard the rich uncertainty structure that comes from sensor noise and occlusion. This project asks: can we get the best of both worlds — the continuous representation of implicit neural networks with the real-time performance of grid maps?
+
+## The Core Idea
+
+We represent the occupancy field as a small MLP that takes a 3D coordinate and outputs an occupancy probability. The network is updated online as new LiDAR scans arrive, using a combination of:
+
+1. **Free-space supervision** from ray casting
+2. **Occupied supervision** at hit points
+3. **MC Dropout** for uncertainty estimation without additional overhead
+
+The key insight is that we don't need a large network. A 4-layer MLP with 64 hidden units is sufficient to represent the occupancy structure of a typical indoor environment, and it runs fast enough to update at 30 Hz on a single GPU.
+
+## Architecture
+
+```python
+class OccupancyMLP(nn.Module):
+    def __init__(self, hidden=64, layers=4):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(3, hidden), nn.ReLU(),
+            *[nn.Sequential(nn.Linear(hidden, hidden),
+                            nn.Dropout(0.1), nn.ReLU())
+              for _ in range(layers - 2)],
+            nn.Linear(hidden, 1),
+        )
+
+    def forward(self, x):
+        return torch.sigmoid(self.net(x))
+```
+
+The dropout layers serve dual purpose: regularization during training, and uncertainty estimation at inference via Monte Carlo sampling.
+
+## Real-Time Performance
+
+The main challenge is making this fast enough for online use. We use three strategies:
+
+**Spatial hashing** maps 3D coordinates to network inputs efficiently, avoiding redundant queries for the same location.
+
+**Incremental training** updates only the network parameters relevant to the current scan's bounding box, using gradient masking.
+
+**CUDA kernel for ray casting** parallelizes the free-space supervision computation, which is otherwise the bottleneck.
+
+Combined, these bring the per-scan update time from ~120ms (naive PyTorch) to ~28ms (optimized), well within the 33ms budget for 30 Hz operation.
+
+## Uncertainty Visualization
+
+One of the more practically useful outputs is the uncertainty map. High-uncertainty regions correspond to:
+- Areas seen from only one angle (occlusion uncertainty)
+- Areas near the sensor range limit (range uncertainty)
+- Dynamic objects that have moved between scans
+
+The robot's planner uses this uncertainty map to prefer paths through well-observed regions.
+
+## Publication
+
+This work was published at RSS 2023. The paper and code are linked below.

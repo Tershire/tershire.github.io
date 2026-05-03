@@ -47,16 +47,14 @@ const pathname = Astro.url.pathname;
 
             {link.children.length > 0 && (
               <div class="absolute top-full left-0 pt-2 hidden group-hover:block">
-                <ul class="bg-white/95 backdrop-blur-sm border border-gray-200 rounded-xl shadow-lg py-1 min-w-[160px]">
+                <ul class="nav-dropdown-menu rounded-xl shadow-xl py-1 min-w-[160px]">
                   {link.children.map((child) => (
                     <li>
                       <a
                         href={child.href}
                         class:list={[
-                          'block px-4 py-2 text-sm transition-colors rounded-md mx-1',
-                          pathname === child.href
-                            ? 'bg-[var(--color-accent)]/10 text-[var(--color-accent)] font-medium'
-                            : 'text-gray-700 hover:bg-gray-100',
+                          'nav-dropdown-link block px-4 py-2.5 text-sm transition-colors rounded-lg mx-1',
+                          pathname === child.href ? 'active' : '',
                         ]}
                       >
                         {child.label}
@@ -113,6 +111,44 @@ const pathname = Astro.url.pathname;
     </div>
   </div>
 </nav>
+
+<style>
+  /* Nav dropdown: light mode */
+  .nav-dropdown-menu {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  .nav-dropdown-link {
+    color: #374151;
+  }
+  .nav-dropdown-link:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--color-accent);
+  }
+  .nav-dropdown-link.active {
+    background: rgba(79, 124, 172, 0.1);
+    color: var(--color-accent);
+    font-weight: 500;
+  }
+
+  /* Nav dropdown: dark mode */
+  [data-theme="dark"] .nav-dropdown-menu {
+    background: rgba(28, 28, 26, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  [data-theme="dark"] .nav-dropdown-link {
+    color: #d1d5db;
+  }
+  [data-theme="dark"] .nav-dropdown-link:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--color-accent);
+  }
+  [data-theme="dark"] .nav-dropdown-link.active {
+    background: rgba(111, 163, 212, 0.15);
+    color: var(--color-accent);
+  }
+</style>
 
 <!-- Mobile menu drawer -->
 <div id="mobile-menu" class="fixed inset-0 z-40 hidden">

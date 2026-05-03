@@ -1,0 +1,69 @@
+---
+title: "Visual-Inertial SLAM for Legged Robots"
+description: "A tightly-coupled VIO system designed for quadruped robots on unstructured terrain."
+date: "2024-01-01"
+tags: ["SLAM", "Robotics", "C++", "ROS2", "Computer Vision"]
+---
+
+Legged robots present unique challenges for state estimation: periodic contact events cause vibrations, the body undergoes large attitude changes, and the environment is often GPS-denied. Standard VIO pipelines assume a relatively smooth motion profile — assumptions that break down the moment a quadruped starts bounding across gravel.
+
+This project develops a tightly-coupled visual-inertial odometry system that addresses these failure modes head-on.
+
+## Motivation
+
+Most VIO benchmarks evaluate on UAV or handheld datasets. Legged robots are fundamentally different:
+
+- **High-frequency vibrations** from foot impacts corrupt IMU integration
+- **Dynamic occlusion** as legs pass through the camera's field of view
+- **Aggressive attitude changes** during stair climbing or jumping
+
+Existing systems like VINS-Mono and ORB-SLAM3 degrade significantly in these conditions. We needed something purpose-built.
+
+## System Overview
+
+The system has three main components:
+
+### Front-end: Gait-Aware Feature Tracking
+
+Standard KLT tracking fails during foot-strike events when the camera shakes. We use the gait phase estimate from the locomotion controller to classify high-vibration windows and apply a more conservative outlier rejection threshold during those periods.
+
+```cpp
+void FeatureTracker::track(const Frame& prev, const Frame& curr) {
+  // Adjust RANSAC threshold based on gait phase
+  float ransac_thresh = gait_estimator_->is_impact_phase()
+    ? kHighVibrationThresh   // 2.0 px
+    : kNominalThresh;        // 1.0 px
+
+  optical_flow_.track(prev, curr, ransac_thresh);
+}
+```
+
+### Back-end: IMU Preintegration with Vibration Compensation
+
+We extend standard IMU preintegration with a vibration model that attenuates high-frequency noise during foot impacts. The model parameters are identified offline using data from an accelerometer placed directly on the foot.
+
+The preintegration factor then becomes:
+
+```
+r_preint = [ΔR_ij, Δv_ij, Δp_ij] + vibration_correction
+```
+
+### Loop Closure
+
+We use DBoW3 for place recognition with a custom vocabulary trained on outdoor terrain images. Loop closures are validated geometrically using a PnP solver with RANSAC.
+
+## Results
+
+Evaluated on a custom outdoor dataset (gravel paths, grass, stairs) with a Unitree Go1:
+
+| Method | RMSE (m) | Max Error (m) |
+|--------|----------|---------------|
+| VINS-Mono | 0.42 | 1.83 |
+| ORB-SLAM3 | 0.38 | 1.41 |
+| **Ours** | **0.11** | **0.34** |
+
+The improvement is most pronounced on sequences with stair climbing, where standard methods frequently lose tracking.
+
+## Current Status
+
+The system is running on the lab's Unitree Go2 platform. We are preparing a submission to ICRA 2025 and will release the code upon acceptance.

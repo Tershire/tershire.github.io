@@ -1,0 +1,37 @@
+---
+import { getCollection, render } from 'astro:content';
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('hobbies');
+  return entries.map(entry => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<ArticleLayout
+  title={entry.data.title}
+  description={entry.data.description}
+  tags={entry.data.tags}
+  image={entry.data.image}
+>
+  <div style="margin-bottom:2.5rem;">
+    <a href="/hobbies" style="display:inline-flex;align-items:center;gap:0.375rem;font-size:0.875rem;color:var(--color-text-muted);text-decoration:none;transition:color 0.15s;" class="back-link">
+      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
+      </svg>
+      All Hobbies
+    </a>
+  </div>
+
+  <Content />
+</ArticleLayout>
+
+<style>
+  .back-link:hover { color: var(--color-accent) !important; }
+</style>

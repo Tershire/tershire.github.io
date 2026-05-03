@@ -1,49 +1,29 @@
 import { useState, useMemo } from 'react';
+import type { Hobby } from '../data/hobbies';
+import { TYPE_LABELS } from '../data/hobbies';
 
-export interface Project {
-  slug: string;
-  title: string;
-  description: string;
-  type: 'academic' | 'personal' | 'collaborative' | 'open-source';
-  startYear: number;
-  endYear: number | null;
-  tags: string[];
-  image?: string;
-  link?: string;
-  paperLink?: string;
-  codeLink?: string;
-  featured?: boolean;
-}
-
-const TYPE_LABELS: Record<Project['type'], string> = {
-  academic: 'Academic Research',
-  personal: 'Personal Research',
-  collaborative: 'Collaborative',
-  'open-source': 'Open Source',
+const TYPE_COLORS: Record<Hobby['type'], { bg: string; text: string }> = {
+  tech:          { bg: 'rgba(219,234,254,0.7)', text: '#2563eb' },
+  physical:      { bg: 'rgba(209,250,229,0.7)', text: '#059669' },
+  art:           { bg: 'rgba(254,243,199,0.7)', text: '#d97706' },
+  unclassified:  { bg: 'rgba(243,244,246,0.7)', text: '#6b7280' },
 };
 
-const TYPE_COLORS: Record<Project['type'], { bg: string; text: string }> = {
-  academic:      { bg: 'rgba(219,234,254,0.7)', text: '#1d4ed8' },
-  personal:      { bg: 'rgba(209,250,229,0.7)', text: '#065f46' },
-  collaborative: { bg: 'rgba(254,243,199,0.7)', text: '#92400e' },
-  'open-source': { bg: 'rgba(243,232,255,0.7)', text: '#6d28d9' },
-};
-
-const MIN_YEAR = 2015;
+const MIN_YEAR = 2010;
 const MAX_YEAR = new Date().getFullYear();
 
-export default function ProjectsGrid({ projects }: { projects: Project[] }) {
-  const [selectedTypes, setSelectedTypes] = useState<Set<Project['type']>>(new Set());
+export default function HobbiesGrid({ hobbies }: { hobbies: Hobby[] }) {
+  const [selectedTypes, setSelectedTypes] = useState<Set<Hobby['type']>>(new Set());
   const [yearRange, setYearRange] = useState<[number, number]>([MIN_YEAR, MAX_YEAR]);
   const [search, setSearch] = useState('');
 
   const allTypes = useMemo(() => {
-    const s = new Set<Project['type']>();
-    projects.forEach(p => s.add(p.type));
+    const s = new Set<Hobby['type']>();
+    hobbies.forEach(h => s.add(h.type));
     return Array.from(s);
-  }, [projects]);
+  }, [hobbies]);
 
-  const toggleType = (t: Project['type']) => {
+  const toggleType = (t: Hobby['type']) => {
     setSelectedTypes(prev => {
       const next = new Set(prev);
       next.has(t) ? next.delete(t) : next.add(t);
@@ -51,16 +31,16 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
     });
   };
 
-  const filtered = useMemo(() => projects.filter(p => {
-    if (selectedTypes.size > 0 && !selectedTypes.has(p.type)) return false;
-    const end = p.endYear ?? MAX_YEAR;
-    if (end < yearRange[0] || p.startYear > yearRange[1]) return false;
+  const filtered = useMemo(() => hobbies.filter(h => {
+    if (selectedTypes.size > 0 && !selectedTypes.has(h.type)) return false;
+    const end = h.endYear ?? MAX_YEAR;
+    if (end < yearRange[0] || h.startYear > yearRange[1]) return false;
     if (search) {
       const q = search.toLowerCase();
-      if (!p.title.toLowerCase().includes(q) && !p.description.toLowerCase().includes(q) && !p.tags.some(t => t.toLowerCase().includes(q))) return false;
+      if (!h.name.toLowerCase().includes(q) && !h.description.toLowerCase().includes(q)) return false;
     }
     return true;
-  }), [projects, selectedTypes, yearRange, search]);
+  }), [hobbies, selectedTypes, yearRange, search]);
 
   const years = Array.from({ length: MAX_YEAR - MIN_YEAR + 1 }, (_, i) => MIN_YEAR + i);
   const leftZ = yearRange[0] >= yearRange[1] ? 1 : 2;
@@ -74,7 +54,7 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
           <svg style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }} width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
-          <input type="text" placeholder="Search projects..." value={search} onChange={e => setSearch(e.target.value)}
+          <input type="text" placeholder="Search hobbies..." value={search} onChange={e => setSearch(e.target.value)}
             style={{ width: '100%', padding: '0.625rem 1rem 0.625rem 2.5rem', border: '1px solid var(--color-border)', borderRadius: '0.75rem', fontSize: '0.9375rem', outline: 'none', background: 'var(--color-card)', color: 'var(--color-text)' }} />
         </div>
       </div>
@@ -118,16 +98,16 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
       </div>
 
       <p style={{ fontSize: '0.875rem', color: 'var(--color-text-muted)', marginBottom: '1.5rem' }}>
-        Showing <strong style={{ color: 'var(--color-text)' }}>{filtered.length}</strong> of {projects.length} projects
+        Showing <strong style={{ color: 'var(--color-text)' }}>{filtered.length}</strong> of {hobbies.length} hobbies
       </p>
 
       {filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--color-text-muted)' }}>
-          <p>No projects match your filters.</p>
+          <p>No hobbies match your filters.</p>
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '1.25rem' }}>
-          {filtered.map(p => <ProjectCard key={p.slug} project={p} />)}
+          {filtered.map(h => <HobbyCard key={h.slug} hobby={h} />)}
         </div>
       )}
 
@@ -140,51 +120,60 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
   );
 }
 
-function ProjectCard({ project }: { project: Project }) {
+function HobbyCard({ hobby }: { hobby: Hobby }) {
   const [hovered, setHovered] = useState(false);
-  const col = TYPE_COLORS[project.type];
+  const col = TYPE_COLORS[hobby.type];
+  const Wrapper = hobby.hasDetail ? 'a' : 'div';
 
   return (
-    <a
-      href={`/projects/${project.slug}`}
+    <Wrapper
+      {...(hobby.hasDetail ? { href: `/hobbies/${hobby.slug}` } : {})}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      style={{ display: 'flex', flexDirection: 'column', background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: '1rem', overflow: 'hidden', textDecoration: 'none', transition: 'box-shadow 0.2s, transform 0.2s', boxShadow: hovered ? '0 8px 24px rgba(0,0,0,0.12)' : '0 1px 3px rgba(0,0,0,0.06)', transform: hovered ? 'translateY(-3px)' : 'none' }}
+      style={{
+        display: 'flex', flexDirection: 'column',
+        background: 'var(--color-card)',
+        border: '1px solid var(--color-border)',
+        borderRadius: '1.25rem', overflow: 'hidden',
+        textDecoration: 'none',
+        transition: 'box-shadow 0.2s, transform 0.2s',
+        boxShadow: hovered && hobby.hasDetail ? '0 8px 24px rgba(0,0,0,0.12)' : '0 1px 3px rgba(0,0,0,0.06)',
+        transform: hovered && hobby.hasDetail ? 'translateY(-3px)' : 'none',
+        cursor: hobby.hasDetail ? 'pointer' : 'default',
+      }}
     >
-      {project.image ? (
-        <div style={{ height: '160px', overflow: 'hidden', background: 'var(--color-code-bg)' }}>
-          <img src={project.image} alt={project.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s', transform: hovered ? 'scale(1.04)' : 'scale(1)' }} />
-        </div>
-      ) : (
-        <div style={{ height: '100px', background: 'linear-gradient(135deg,rgba(79,124,172,0.1),rgba(79,124,172,0.04))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke="var(--color-accent)" strokeWidth={1.5} style={{ opacity: 0.4 }}>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-          </svg>
-        </div>
-      )}
+      {/* Color header */}
+      <div style={{ height: '90px', background: hobby.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem', flexShrink: 0 }}>
+        {hobby.emoji}
+      </div>
 
       <div style={{ padding: '1.25rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.5rem' }}>
-          <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600, color: 'var(--color-text)', lineHeight: 1.3 }}>{project.title}</h3>
-          {project.featured && <span style={{ flexShrink: 0, padding: '0.1rem 0.5rem', background: 'rgba(254,243,199,0.7)', color: '#92400e', borderRadius: '9999px', fontSize: '0.6875rem', fontWeight: 600 }}>Featured</span>}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
+          <h2 style={{ fontSize: '1.0625rem', fontWeight: 700, margin: 0, color: hobby.accent }}>{hobby.name}</h2>
+          {hobby.hasDetail && (
+            <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ color: hobby.accent, opacity: 0.6, flexShrink: 0 }}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+            </svg>
+          )}
         </div>
-        <p style={{ margin: '0 0 0.875rem', fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.6, flex: 1 }}>{project.description}</p>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem', marginBottom: '1rem' }}>
-          {project.tags.slice(0, 4).map(tag => (
-            <span key={tag} style={{ padding: '0.15rem 0.625rem', background: 'var(--color-code-bg)', color: 'var(--color-text-muted)', border: '1px solid var(--color-border)', borderRadius: '9999px', fontSize: '0.6875rem' }}>{tag}</span>
+
+        <p style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)', lineHeight: 1.65, margin: '0 0 1rem', flex: 1 }}>{hobby.description}</p>
+
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem', marginBottom: '0.875rem' }}>
+          {hobby.highlights.map(h => (
+            <span key={h} style={{ padding: '0.15rem 0.625rem', background: hobby.color, color: hobby.accent, borderRadius: '9999px', fontSize: '0.6875rem', fontWeight: 500 }}>{h}</span>
           ))}
         </div>
+
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingTop: '0.75rem', borderTop: '1px solid var(--color-border)' }}>
-          <span style={{ background: col.bg, color: col.text, padding: '0.15rem 0.625rem', borderRadius: '9999px', fontSize: '0.6875rem', fontWeight: 500 }}>{TYPE_LABELS[project.type]}</span>
-          <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{project.startYear}–{project.endYear ?? 'Now'}</span>
+          <span style={{ background: col.bg, color: col.text, padding: '0.15rem 0.625rem', borderRadius: '9999px', fontSize: '0.6875rem', fontWeight: 500 }}>
+            {TYPE_LABELS[hobby.type]}
+          </span>
+          <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+            {hobby.startYear}–{hobby.endYear ?? 'Now'}
+          </span>
         </div>
-        {(project.codeLink || project.paperLink) && (
-          <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.75rem' }}>
-            {project.codeLink && <a href={project.codeLink} target="_blank" rel="noopener" onClick={e => e.stopPropagation()} style={{ padding: '0.375rem 0.875rem', background: 'var(--color-code-bg)', color: 'var(--color-text)', borderRadius: '0.5rem', fontSize: '0.75rem', fontWeight: 500, textDecoration: 'none' }}>Code</a>}
-            {project.paperLink && <a href={project.paperLink} target="_blank" rel="noopener" onClick={e => e.stopPropagation()} style={{ padding: '0.375rem 0.875rem', background: 'rgba(79,124,172,0.12)', color: 'var(--color-accent)', borderRadius: '0.5rem', fontSize: '0.75rem', fontWeight: 500, textDecoration: 'none' }}>Paper</a>}
-          </div>
-        )}
       </div>
-    </a>
+    </Wrapper>
   );
 }

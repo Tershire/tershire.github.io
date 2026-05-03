@@ -6,10 +6,9 @@ import { SITE, NAV_LINKS } from '../data/site';
 <BaseLayout noNav noPadding title="Home">
   <!-- Top nav bar -->
   <header class="fixed top-0 left-0 right-0 z-50 h-[52px] bg-black/40 backdrop-blur-md border-b border-white/10">
-    <div style="max-width:1400px;margin:0 auto;padding:0 1.5rem;height:100%;display:flex;align-items:center;justify-content:space-between;">
-      <span style="color:white;font-weight:600;font-size:1.125rem;letter-spacing:0.025em;">{SITE.name}</span>
-      <nav>
-        <ul style="display:flex;align-items:center;gap:0.25rem;list-style:none;margin:0;padding:0;">
+    <div style="max-width:1400px;margin:0 auto;padding:0 1.5rem;height:100%;display:flex;align-items:center;justify-content:flex-end;">
+      <nav style="display:flex;align-items:center;flex-wrap:nowrap;gap:0;">
+        <ul style="display:flex;align-items:center;gap:0.25rem;list-style:none;margin:0;padding:0;flex-wrap:nowrap;">
           {NAV_LINKS.map((link) => (
             <li style="position:relative;" class="nav-item">
               <a
@@ -26,13 +25,13 @@ import { SITE, NAV_LINKS } from '../data/site';
               </a>
               {link.children.length > 0 && (
                 <div class="nav-dropdown" style="position:absolute;top:100%;left:0;padding-top:0.5rem;opacity:0;visibility:hidden;transition:all 0.15s;pointer-events:none;">
-                  <ul style="background:rgba(255,255,255,0.97);backdrop-filter:blur(8px);border:1px solid #e5e7eb;border-radius:0.75rem;box-shadow:0 10px 25px rgba(0,0,0,0.12);padding:0.25rem;min-width:160px;list-style:none;margin:0;">
+                  <ul class="nav-dropdown-menu" style="border-radius:0.75rem;box-shadow:0 10px 25px rgba(0,0,0,0.12);padding:0.25rem;min-width:160px;list-style:none;margin:0;">
                     {link.children.map((child) => (
                       <li>
                         <a
                           href={child.href}
-                          style="display:block;padding:0.625rem 1rem;font-size:0.875rem;color:#374151;text-decoration:none;border-radius:0.5rem;transition:all 0.1s;"
-                          class="dropdown-link"
+                          class="nav-dropdown-link"
+                          style="display:block;padding:0.625rem 1rem;font-size:0.875rem;text-decoration:none;border-radius:0.5rem;transition:all 0.1s;"
                         >
                           {child.label}
                         </a>
@@ -165,6 +164,31 @@ import { SITE, NAV_LINKS } from '../data/site';
   </div>
 </BaseLayout>
 
+<style>
+  /* Dropdown: light mode */
+  .nav-dropdown-menu {
+    background: rgba(255, 255, 255, 0.97);
+    backdrop-filter: blur(8px);
+    border: 1px solid #e5e7eb;
+  }
+  .nav-dropdown-link { color: #374151; }
+  .nav-dropdown-link:hover {
+    background: #f9fafb;
+    color: var(--color-accent);
+  }
+
+  /* Dropdown: dark mode */
+  [data-theme="dark"] .nav-dropdown-menu {
+    background: rgba(28, 28, 26, 0.97);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  [data-theme="dark"] .nav-dropdown-link { color: #d1d5db; }
+  [data-theme="dark"] .nav-dropdown-link:hover {
+    background: rgba(255, 255, 255, 0.08);
+    color: var(--color-accent);
+  }
+</style>
+
 <script>
   // Nav hover effects
   document.querySelectorAll('.nav-item').forEach(item => {
@@ -187,10 +211,6 @@ import { SITE, NAV_LINKS } from '../data/site';
     a.addEventListener('mouseleave', () => { (a as HTMLElement).style.background = ''; (a as HTMLElement).style.color = 'rgba(255,255,255,0.8)'; });
   });
 
-  document.querySelectorAll('.dropdown-link').forEach(a => {
-    a.addEventListener('mouseenter', () => { (a as HTMLElement).style.background = '#f9fafb'; (a as HTMLElement).style.color = '#4f7cac'; });
-    a.addEventListener('mouseleave', () => { (a as HTMLElement).style.background = ''; (a as HTMLElement).style.color = '#374151'; });
-  });
 
   document.querySelectorAll('.social-icon').forEach(a => {
     a.addEventListener('mouseenter', () => { (a as HTMLElement).style.background = 'rgba(255,255,255,0.2)'; (a as HTMLElement).style.color = 'white'; });

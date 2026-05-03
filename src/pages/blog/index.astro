@@ -26,8 +26,8 @@ function tagStyle(tag: string) {
   <div class="page-container py-16">
     <div style="margin-bottom:3rem;">
       <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;">
-        <div style="width:3px;height:2rem;background:linear-gradient(180deg,#4f7cac,#7aa3cc);border-radius:9999px;"></div>
-        <p style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:#9ca3af;margin:0;">Writing</p>
+        <div style="width:3px;height:2rem;background:linear-gradient(180deg,var(--color-accent),var(--color-accent-light));border-radius:9999px;"></div>
+        <p style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-text-muted);margin:0;">Writing</p>
       </div>
       <h1 class="section-title">Blog</h1>
       <p class="section-subtitle">
@@ -41,7 +41,7 @@ function tagStyle(tag: string) {
         return (
           <a
             href={`/blog/${post.id}`}
-            style="display:block;text-decoration:none;background:white;border:1px solid #e5e5e0;border-radius:1rem;padding:1.75rem;transition:all 0.2s;"
+            style="display:block;text-decoration:none;background:var(--color-card);border:1px solid var(--color-border);border-radius:1rem;padding:1.75rem;transition:all 0.2s;"
             class="blog-card"
           >
             {post.data.tags && (
@@ -53,24 +53,19 @@ function tagStyle(tag: string) {
                 ))}
               </div>
             )}
-            <h2 style="margin:0 0 0.625rem;font-size:1.1875rem;font-weight:700;color:#111827;line-height:1.35;">
+            <h2 style="margin:0 0 0.625rem;font-size:1.1875rem;font-weight:700;color:var(--color-text);line-height:1.35;">
               {post.data.title}
             </h2>
             {post.data.description && (
-              <p style="margin:0 0 1rem;font-size:0.9375rem;color:#6b7280;line-height:1.6;">
+              <p style="margin:0 0 1rem;font-size:0.9375rem;color:var(--color-text-muted);line-height:1.6;">
                 {post.data.description}
               </p>
             )}
             <div style="display:flex;align-items:center;justify-content:space-between;">
-              <span style="font-size:0.8125rem;color:#9ca3af;">{date}</span>
-              <div style="display:flex;align-items:center;gap:0.5rem;">
-                {post.data.readingTime && (
-                  <span style="font-size:0.8125rem;color:#9ca3af;">{post.data.readingTime} min read</span>
-                )}
-                <svg style="color:#9ca3af;" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </div>
+              <span style="font-size:0.8125rem;color:var(--color-text-muted);">{date}</span>
+              <svg style="color:var(--color-text-muted);" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
             </div>
           </a>
         );
