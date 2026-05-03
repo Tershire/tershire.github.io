@@ -1,0 +1,23 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PapersGrid from '../../components/PapersGrid';
+import { papers } from '../../data/papers';
+---
+
+<BaseLayout title="Papers" description="Academic publications by Tershire.">
+  <div class="page-container py-16">
+    <div style="margin-bottom:3rem;">
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;">
+        <div style="width:3px;height:2rem;background:linear-gradient(180deg,#4f7cac,#7aa3cc);border-radius:9999px;"></div>
+        <p style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:#9ca3af;margin:0;">Publications</p>
+      </div>
+      <h1 class="section-title">Papers</h1>
+      <p class="section-subtitle">
+        Peer-reviewed publications in robotics, perception, and machine learning.
+        Click any paper to expand the abstract.
+      </p>
+    </div>
+
+    <PapersGrid papers={papers} client:load />
+  </div>
+</BaseLayout>

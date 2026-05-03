@@ -1,0 +1,24 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ProjectsGrid from '../../components/ProjectsGrid';
+import { projects } from '../../data/projects';
+---
+
+<BaseLayout title="Projects" description="Research and engineering projects by Tershire.">
+  <div class="page-container py-16">
+    <!-- Header -->
+    <div style="margin-bottom:3rem;">
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;">
+        <div style="width:3px;height:2rem;background:linear-gradient(180deg,#4f7cac,#7aa3cc);border-radius:9999px;"></div>
+        <p style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:#9ca3af;margin:0;">Portfolio</p>
+      </div>
+      <h1 class="section-title">Projects</h1>
+      <p class="section-subtitle">
+        A collection of research and engineering work — from robotics and perception to systems and tooling.
+      </p>
+    </div>
+
+    <!-- Interactive grid (React island) -->
+    <ProjectsGrid projects={projects} client:load />
+  </div>
+</BaseLayout>
