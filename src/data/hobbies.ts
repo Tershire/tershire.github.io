@@ -8,6 +8,7 @@ export interface Hobby {
   description: string;
   highlights: string[];
   image?: string;
+  imagePosition?: string;
   color: string;
   accent: string;
   hasDetail: boolean;
@@ -26,6 +27,8 @@ export const hobbies: Hobby[] = [
     description: "Martial arts.",
     highlights: [''],
     hasDetail: true,
+    image: '/images/hobbies/boxing.webp',
+    imagePosition: 'top',
   },
   {
     slug: 'piano',
@@ -39,6 +42,8 @@ export const hobbies: Hobby[] = [
     description: "Musical instrument.",
     highlights: ['Roland FP-30X'],
     hasDetail: true,
+    image: '/images/hobbies/piano.webp',
+    imagePosition: 'bottom',
   },
 ];
 

@@ -3,17 +3,16 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE } from '../data/site';
 
 const timeline = [
-  { year: '2023–Now', title: 'Ph.D. Candidate', org: 'KAIST, Robotics Program', desc: 'Dissertation on robust state estimation for legged robots in unstructured environments.' },
-  { year: '2021–2023', title: 'Research Engineer', org: 'Naver Labs', desc: 'Built the perception stack for the indoor delivery robot fleet — mapping, localization, obstacle detection.' },
-  { year: '2019–2021', title: 'M.S. in Robotics', org: 'Seoul National University', desc: 'Thesis on depth completion from sparse LiDAR and monocular cameras.' },
-  { year: '2015–2019', title: 'B.S. in Mechanical Engineering', org: 'POSTECH', desc: 'Graduated with honors. Minored in computer science. Captain of the university robot team.' },
+  { year: '2025–Now', title: 'Navigation Engineer', org: 'Hanwha Aerospace', desc: 'INS-GNSS, SLAM.' },
+  { year: '2023–2024', title: 'M.S. in Aerospace Systems & Control', org: 'ISAE-SUPAERO', desc: 'Thesis: ....' },
+  { year: '2016–2022', title: 'B.S. in Aerospace Engineering', org: 'Georgia Institute of Technology', desc: '.' },
 ];
 
 const skills = {
-  'Robotics & Perception': ['SLAM', 'VIO', 'Point Cloud Processing', 'Object Detection', 'Depth Estimation'],
-  'ML & Deep Learning': ['PyTorch', 'NeRF / Neural Fields', 'Self-Supervised Learning', 'Reinforcement Learning'],
-  'Systems': ['ROS2', 'C++17', 'Python', 'CUDA', 'micro-ROS', 'Embedded (STM32)'],
-  'Tools': ['Git', 'Docker', 'KiCAD', 'SolidWorks', 'Blender'],
+  'Navigation': ['SLAM', 'VO', 'INS-GNSS'],
+  'Machine Learning': ['PyTorch'],
+  'Systems': ['ROS2', 'C++17', 'Python', 'Embedded (STM32)'],
+  'Tools': ['Git', 'Docker', 'SolidWorks'],
 };
 ---
 
@@ -34,20 +33,18 @@ const skills = {
         <!-- Bio -->
         <div class="prose" style="margin-bottom:3rem;">
           <p>
-            I'm a Ph.D. candidate at KAIST working on robust state estimation and perception for legged robots.
-            My research sits at the intersection of computer vision, IMU-based sensing, and learning-based methods —
-            I want robots to be able to navigate the real world reliably, even when things go wrong.
+            I am an navigation engineer and have a deep interest in SLAM. 
           </p>
           <p>
-            Before KAIST, I spent two years at Naver Labs building the perception stack for indoor delivery robots.
-            That experience gave me a healthy respect for the gap between research demos and production systems.
+            - favorite sensors: mono camera, IMU
           </p>
           <p>
-            I'm from Seoul. Outside of research, I shoot film photography, climb rocks, and have too many mechanical keyboards.
-            I try to write regularly — both technical posts and occasional personal reflections.
+            - research interests: online learning, efficient SLAM data representation (just like a human), dynamic environments, scene-graphs, biomimetics
+          <p>
+            I'm from Seoul.
           </p>
           <p>
-            If you want to collaborate, ask about my research, or just talk about cameras, feel free to reach out.
+            Feel free to reach out.
           </p>
         </div>
 

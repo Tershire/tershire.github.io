@@ -142,9 +142,12 @@ function HobbyCard({ hobby }: { hobby: Hobby }) {
         cursor: hobby.hasDetail ? 'pointer' : 'default',
       }}
     >
-      {/* Color header */}
-      <div style={{ height: '90px', background: hobby.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem', flexShrink: 0 }}>
-        {hobby.emoji}
+      {/* Image / color header */}
+      <div style={{ height: hobby.image ? '160px' : '90px', background: hobby.color, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '3rem', flexShrink: 0, overflow: 'hidden', position: 'relative' }}>
+        {hobby.image
+          ? <img src={hobby.image} alt={hobby.name} style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', objectPosition: hobby.imagePosition ?? 'center' }} />
+          : hobby.emoji
+        }
       </div>
 
       <div style={{ padding: '1.25rem', flex: 1, display: 'flex', flexDirection: 'column' }}>

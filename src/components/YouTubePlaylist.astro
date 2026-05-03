@@ -1,0 +1,134 @@
+---
+interface Props {
+  url: string;
+  title?: string;
+}
+
+interface Track {
+  videoId: string;
+  title: string;
+  thumbnail: string;
+  position: number;
+}
+
+const { url, title } = Astro.props;
+
+function parseYouTubeUrl(raw: string): { videoId: string | null; listId: string | null } {
+  try {
+    const u = new URL(raw);
+    const videoId = u.searchParams.get('v') ?? (u.hostname === 'youtu.be' ? u.pathname.slice(1).split('?')[0] : null);
+    return { videoId, listId: u.searchParams.get('list') };
+  } catch {
+    return { videoId: null, listId: null };
+  }
+}
+
+const { videoId: startVideoId, listId } = parseYouTubeUrl(url);
+const apiKey = import.meta.env.YOUTUBE_API_KEY;
+
+let tracks: Track[] = [];
+
+if (listId && apiKey) {
+  try {
+    const res = await fetch(
+      `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${listId}&key=${apiKey}`
+    );
+    if (res.ok) {
+      const data = await res.json() as { items: any[] };
+      tracks = data.items
+        .filter(item => item.snippet.resourceId?.videoId)
+        .map(item => ({
+          videoId: item.snippet.resourceId.videoId,
+          title: item.snippet.title,
+          thumbnail: item.snippet.thumbnails?.default?.url ?? '',
+          position: item.snippet.position,
+        }));
+    }
+  } catch {}
+}
+
+const initialVideoId = startVideoId ?? tracks[0]?.videoId ?? '';
+const embedBase = `https://www.youtube-nocookie.com/embed/`;
+const listParam = listId ? `?list=${listId}` : '';
+---
+
+{tracks.length > 0 ? (
+  <div style="margin:2rem 0;border:1px solid var(--color-border);border-radius:1rem;overflow:hidden;">
+    <!-- Player -->
+    <div style="position:relative;width:100%;padding-bottom:56.25%;background:#000;">
+      <iframe
+        id="yt-playlist-player"
+        src={`${embedBase}${initialVideoId}${listParam}`}
+        title={title ?? tracks[0]?.title ?? 'YouTube'}
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+        allowfullscreen
+        loading="lazy"
+        style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"
+      ></iframe>
+    </div>
+
+    <!-- Track list -->
+    <div style="max-height:280px;overflow-y:auto;background:var(--color-card);">
+      {tracks.map((track, i) => (
+        <button
+          class="yt-track-btn"
+          data-video-id={track.videoId}
+          data-list-id={listId ?? ''}
+          data-active={track.videoId === initialVideoId ? 'true' : 'false'}
+          style={`
+            display:flex;align-items:center;gap:0.75rem;
+            width:100%;padding:0.625rem 1rem;
+            background:${track.videoId === initialVideoId ? 'rgba(79,124,172,0.1)' : 'transparent'};
+            border:none;border-bottom:1px solid var(--color-border);
+            cursor:pointer;text-align:left;transition:background 0.15s;
+          `}
+        >
+          <span style="font-size:0.75rem;color:var(--color-text-muted);width:1.75rem;flex-shrink:0;text-align:right;">
+            {track.videoId === initialVideoId ? '▶' : i + 1}
+          </span>
+          <span style={`font-size:0.875rem;line-height:1.4;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:${track.videoId === initialVideoId ? 'var(--color-accent)' : 'var(--color-text)'};font-weight:${track.videoId === initialVideoId ? 600 : 400};`}>
+            {track.title}
+          </span>
+        </button>
+      ))}
+    </div>
+  </div>
+) : (
+  <!-- Fallback: plain player if API fetch failed or no list -->
+  <div style="position:relative;width:100%;padding-bottom:56.25%;border-radius:0.75rem;overflow:hidden;margin:2rem 0;">
+    <iframe
+      src={`${embedBase}${initialVideoId}${listParam}`}
+      title={title ?? 'YouTube'}
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen
+      loading="lazy"
+      style="position:absolute;top:0;left:0;width:100%;height:100%;border:0;"
+    ></iframe>
+  </div>
+)}
+
+<script>
+  const player = document.getElementById('yt-playlist-player') as HTMLIFrameElement | null;
+  const buttons = document.querySelectorAll<HTMLButtonElement>('.yt-track-btn');
+
+  buttons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const videoId = btn.dataset.videoId!;
+      const listId = btn.dataset.listId;
+      if (player) {
+        player.src = `https://www.youtube-nocookie.com/embed/${videoId}${listId ? `?list=${listId}&autoplay=1` : '?autoplay=1'}`;
+      }
+      buttons.forEach((b, idx) => {
+        const isActive = b.dataset.videoId === videoId;
+        b.style.background = isActive ? 'rgba(79,124,172,0.1)' : 'transparent';
+        const numSpan = b.querySelectorAll<HTMLSpanElement>('span')[0];
+        const titleSpan = b.querySelectorAll<HTMLSpanElement>('span')[1];
+        if (numSpan) numSpan.textContent = isActive ? '▶' : String(idx + 1);
+        if (titleSpan) {
+          titleSpan.style.color = isActive ? 'var(--color-accent)' : 'var(--color-text)';
+          titleSpan.style.fontWeight = isActive ? '600' : '400';
+        }
+      });
+    });
+  });
+</script>

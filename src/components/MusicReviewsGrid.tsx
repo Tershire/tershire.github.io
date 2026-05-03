@@ -14,6 +14,10 @@ export interface MusicReview {
   tags: string[];
   color?: string;
   accent?: string;
+  image?: string;
+  spotifyUrl?: string;
+  appleMusicUrl?: string;
+  youtubeUrl?: string;
 }
 
 const TYPE_LABELS: Record<MusicReview['type'], string> = {
@@ -47,6 +51,7 @@ function RatingDots({ rating }: { rating: number }) {
 }
 
 export default function MusicReviewsGrid({ reviews }: { reviews: MusicReview[] }) {
+  const [view, setView] = useState<'list' | 'grid'>('list');
   const [yearRange, setYearRange] = useState<[number, number]>(() => {
     const years = reviews.map(releaseYear);
     return years.length > 0 ? [Math.min(...years), Math.max(...years)] : [2000, new Date().getFullYear()];
@@ -121,7 +126,7 @@ export default function MusicReviewsGrid({ reviews }: { reviews: MusicReview[] }
 
   return (
     <div>
-      {/* Search + type filters */}
+      {/* Search + view toggle */}
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'flex-start', marginBottom: '1.25rem' }}>
         <div style={{ position: 'relative', flex: 1, minWidth: '200px', maxWidth: '400px' }}>
           <svg style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)', pointerEvents: 'none' }} width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -131,7 +136,21 @@ export default function MusicReviewsGrid({ reviews }: { reviews: MusicReview[] }
             style={{ width: '100%', padding: '0.5rem 1rem 0.5rem 2.375rem', border: '1px solid var(--color-border)', borderRadius: '0.75rem', fontSize: '0.875rem', outline: 'none', background: 'var(--color-card)', color: 'var(--color-text)' }} />
         </div>
 
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem', alignItems: 'center' }}>
+        <div style={{ display: 'flex', gap: '0.25rem', background: 'var(--color-code-bg)', padding: '0.25rem', borderRadius: '0.625rem' }}>
+          {(['list', 'grid'] as const).map(v => (
+            <button key={v} onClick={() => setView(v)}
+              style={{ padding: '0.375rem 0.75rem', borderRadius: '0.375rem', fontSize: '0.8125rem', fontWeight: 500, border: 'none', cursor: 'pointer',
+                background: view === v ? 'var(--color-card)' : 'transparent',
+                color: view === v ? 'var(--color-text)' : 'var(--color-text-muted)',
+                boxShadow: view === v ? '0 1px 3px rgba(0,0,0,0.1)' : 'none', transition: 'all 0.15s' }}>
+              {v === 'list' ? '≡ List' : '⊞ Grid'}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Type filters */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem', alignItems: 'center', marginBottom: '1.25rem' }}>
           <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>Type:</span>
           {allTypes.map(type => {
             const active = selectedTypes.has(type);
@@ -147,7 +166,6 @@ export default function MusicReviewsGrid({ reviews }: { reviews: MusicReview[] }
             <button onClick={() => setSelectedTypes(new Set())} style={{ padding: '0.25rem 0.75rem', borderRadius: '9999px', fontSize: '0.8125rem', color: '#ef4444', background: 'rgba(254,226,226,0.5)', border: 'none', cursor: 'pointer' }}>Clear</button>
           )}
         </div>
-      </div>
 
       {/* Country distribution */}
       {countryStats.length > 0 && (
@@ -217,9 +235,13 @@ export default function MusicReviewsGrid({ reviews }: { reviews: MusicReview[] }
         <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--color-text-muted)' }}>
           <p>No reviews match your filters.</p>
         </div>
-      ) : (
+      ) : view === 'list' ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxWidth: '680px' }}>
           {filtered.map(r => <ReviewCard key={r.slug} review={r} />)}
+        </div>
+      ) : (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(180px,1fr))', gap: '1rem' }}>
+          {filtered.map(r => <AlbumCard key={r.slug} review={r} />)}
         </div>
       )}
 
@@ -243,40 +265,86 @@ function ReviewCard({ review: r }: { review: MusicReview }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        display: 'block', textDecoration: 'none',
+        display: 'flex', gap: '1rem', textDecoration: 'none',
         background: 'var(--color-card)', border: '1px solid var(--color-border)',
-        borderRadius: '1rem', padding: '1.5rem',
+        borderRadius: '1rem', padding: '1.25rem',
         transition: 'box-shadow 0.2s, transform 0.2s',
         boxShadow: hovered ? '0 6px 20px rgba(0,0,0,0.1)' : '0 1px 3px rgba(0,0,0,0.05)',
         transform: hovered ? 'translateY(-2px)' : 'none',
       }}
     >
-      {/* Meta row */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
-        <span style={{ background: col.bg, color: col.text, padding: '0.1rem 0.5rem', borderRadius: '9999px', fontSize: '0.6875rem', fontWeight: 600 }}>{TYPE_LABELS[r.type]}</span>
-        <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>{r.flag} {r.country} · {yr}</span>
-        {r.rating != null && <RatingDots rating={r.rating} />}
-      </div>
-
-      {/* Title + artist */}
-      <h3 style={{ margin: '0 0 0.1875rem', fontSize: '1.125rem', fontWeight: 700, color: 'var(--color-text)', lineHeight: 1.3 }}>{r.title}</h3>
-      <p style={{ margin: '0 0 0.625rem', fontSize: '0.9375rem', fontWeight: 500, color: r.accent ?? 'var(--color-accent)' }}>{r.artist}</p>
-
-      {/* Description */}
-      {r.description && (
-        <p style={{ margin: '0 0 0.875rem', fontSize: '0.9375rem', color: 'var(--color-text-muted)', lineHeight: 1.6 }}>{r.description}</p>
+      {/* Thumbnail */}
+      {r.image && (
+        <img src={r.image} alt={r.title}
+          style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '0.625rem', flexShrink: 0, alignSelf: 'flex-start' }} />
       )}
 
-      {/* Tags + arrow */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem' }}>
-          {r.tags.map(t => (
-            <span key={t} style={{ padding: '0.15rem 0.5rem', background: 'var(--color-code-bg)', color: 'var(--color-text-muted)', border: '1px solid var(--color-border)', borderRadius: '9999px', fontSize: '0.6875rem' }}>{t}</span>
-          ))}
+      <div style={{ flex: 1, minWidth: 0 }}>
+        {/* Meta row */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem', flexWrap: 'wrap' }}>
+          <span style={{ background: col.bg, color: col.text, padding: '0.1rem 0.5rem', borderRadius: '9999px', fontSize: '0.6875rem', fontWeight: 600 }}>{TYPE_LABELS[r.type]}</span>
+          <span style={{ fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>{r.flag} {r.country} · {yr}</span>
+          {r.rating != null && <RatingDots rating={r.rating} />}
         </div>
-        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ flexShrink: 0, color: 'var(--color-text-muted)', opacity: hovered ? 1 : 0.5, transition: 'opacity 0.15s' }}>
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-        </svg>
+
+        {/* Title + artist */}
+        <h3 style={{ margin: '0 0 0.1875rem', fontSize: '1.125rem', fontWeight: 700, color: 'var(--color-text)', lineHeight: 1.3 }}>{r.title}</h3>
+        <p style={{ margin: '0 0 0.625rem', fontSize: '0.9375rem', fontWeight: 500, color: r.accent ?? 'var(--color-accent)' }}>{r.artist}</p>
+
+        {/* Description */}
+        {r.description && (
+          <p style={{ margin: '0 0 0.875rem', fontSize: '0.9375rem', color: 'var(--color-text-muted)', lineHeight: 1.6 }}>{r.description}</p>
+        )}
+
+        {/* Tags + arrow */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '0.75rem' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem' }}>
+            {r.tags.map(t => (
+              <span key={t} style={{ padding: '0.15rem 0.5rem', background: 'var(--color-code-bg)', color: 'var(--color-text-muted)', border: '1px solid var(--color-border)', borderRadius: '9999px', fontSize: '0.6875rem' }}>{t}</span>
+            ))}
+          </div>
+          <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} style={{ flexShrink: 0, color: 'var(--color-text-muted)', opacity: hovered ? 1 : 0.5, transition: 'opacity 0.15s' }}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
+      </div>
+    </a>
+  );
+}
+
+function AlbumCard({ review: r }: { review: MusicReview }) {
+  const [hovered, setHovered] = useState(false);
+  const yr = releaseYear(r);
+  const placeholderBg = r.color ?? 'rgba(79,124,172,0.15)';
+  const placeholderAccent = r.accent ?? 'var(--color-accent)';
+
+  return (
+    <a
+      href={`/interests/music/${r.slug}`}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{ display: 'flex', flexDirection: 'column', textDecoration: 'none', background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: '0.875rem', overflow: 'hidden', transition: 'all 0.2s',
+        boxShadow: hovered ? '0 6px 20px rgba(0,0,0,0.12)' : '0 1px 3px rgba(0,0,0,0.06)',
+        transform: hovered ? 'translateY(-3px)' : 'none' }}
+    >
+      {r.image ? (
+        <div style={{ aspectRatio: '1', overflow: 'hidden', flexShrink: 0 }}>
+          <img src={r.image} alt={r.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s', transform: hovered ? 'scale(1.04)' : 'scale(1)' }} />
+        </div>
+      ) : (
+        <div style={{ aspectRatio: '1', background: placeholderBg, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+          <svg width="32" height="32" fill="none" viewBox="0 0 24 24" stroke={placeholderAccent} strokeWidth={1.5} style={{ opacity: 0.5 }}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+          </svg>
+        </div>
+      )}
+      <div style={{ padding: '0.75rem' }}>
+        <p style={{ margin: '0 0 0.125rem', fontSize: '0.875rem', fontWeight: 600, color: 'var(--color-text)', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.title}</p>
+        <p style={{ margin: '0 0 0.375rem', fontSize: '0.75rem', color: r.accent ?? 'var(--color-accent)', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{r.artist}</p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <span style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)' }}>{yr}</span>
+          {r.rating != null && <RatingDots rating={r.rating} />}
+        </div>
       </div>
     </a>
   );

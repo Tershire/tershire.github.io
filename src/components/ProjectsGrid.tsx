@@ -36,6 +36,7 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
   const [selectedTypes, setSelectedTypes] = useState<Set<Project['type']>>(new Set());
   const [yearRange, setYearRange] = useState<[number, number]>([MIN_YEAR, MAX_YEAR]);
   const [search, setSearch] = useState('');
+  const [view, setView] = useState<'grid' | 'list'>('grid');
 
   const allTypes = useMemo(() => {
     const s = new Set<Project['type']>();
@@ -68,14 +69,25 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
 
   return (
     <div>
-      {/* Search */}
-      <div style={{ marginBottom: '1.5rem' }}>
-        <div style={{ position: 'relative', maxWidth: '400px' }}>
+      {/* Search + view toggle */}
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+        <div style={{ position: 'relative', flex: '1', minWidth: '200px', maxWidth: '400px' }}>
           <svg style={{ position: 'absolute', left: '0.875rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-text-muted)' }} width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input type="text" placeholder="Search projects..." value={search} onChange={e => setSearch(e.target.value)}
             style={{ width: '100%', padding: '0.625rem 1rem 0.625rem 2.5rem', border: '1px solid var(--color-border)', borderRadius: '0.75rem', fontSize: '0.9375rem', outline: 'none', background: 'var(--color-card)', color: 'var(--color-text)' }} />
+        </div>
+        <div style={{ display: 'flex', gap: '0.25rem', background: 'var(--color-code-bg)', padding: '0.25rem', borderRadius: '0.625rem' }}>
+          {(['list', 'grid'] as const).map(v => (
+            <button key={v} onClick={() => setView(v)}
+              style={{ padding: '0.375rem 0.75rem', borderRadius: '0.375rem', fontSize: '0.8125rem', fontWeight: 500, border: 'none', cursor: 'pointer',
+                background: view === v ? 'var(--color-card)' : 'transparent',
+                color: view === v ? 'var(--color-text)' : 'var(--color-text-muted)',
+                boxShadow: view === v ? '0 1px 3px rgba(0,0,0,0.1)' : 'none', transition: 'all 0.15s' }}>
+              {v === 'list' ? '≡ List' : '⊞ Grid'}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -124,6 +136,12 @@ export default function ProjectsGrid({ projects }: { projects: Project[] }) {
       {filtered.length === 0 ? (
         <div style={{ textAlign: 'center', padding: '4rem 0', color: 'var(--color-text-muted)' }}>
           <p>No projects match your filters.</p>
+        </div>
+      ) : view === 'list' ? (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+          {filtered.map(p => (
+            <ProjectRow key={p.slug} project={p} />
+          ))}
         </div>
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(300px,1fr))', gap: '1.25rem' }}>
@@ -185,6 +203,48 @@ function ProjectCard({ project }: { project: Project }) {
           </div>
         )}
       </div>
+    </a>
+  );
+}
+
+function ProjectRow({ project }: { project: Project }) {
+  const [hovered, setHovered] = useState(false);
+  const col = TYPE_COLORS[project.type];
+  return (
+    <a
+      href={`/projects/${project.slug}`}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{ display: 'flex', alignItems: 'center', gap: '1rem', textDecoration: 'none', background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: '0.875rem', padding: '1rem 1.25rem', transition: 'all 0.2s',
+        boxShadow: hovered ? '0 4px 16px rgba(0,0,0,0.09)' : '0 1px 3px rgba(0,0,0,0.05)',
+        transform: hovered ? 'translateY(-2px)' : 'none' }}
+    >
+      {/* Thumbnail */}
+      {project.image ? (
+        <img src={project.image} alt={project.title}
+          style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '0.5rem', flexShrink: 0 }} />
+      ) : (
+        <div style={{ width: '56px', height: '56px', borderRadius: '0.5rem', flexShrink: 0, background: 'linear-gradient(135deg,rgba(79,124,172,0.12),rgba(79,124,172,0.04))', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <svg width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="var(--color-accent)" strokeWidth={1.5} style={{ opacity: 0.4 }}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+        </div>
+      )}
+
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
+          <span style={{ background: col.bg, color: col.text, padding: '0.1rem 0.5rem', borderRadius: '9999px', fontSize: '0.6875rem', fontWeight: 600 }}>{TYPE_LABELS[project.type]}</span>
+          <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{project.startYear}–{project.endYear ?? 'Now'}</span>
+          {project.featured && <span style={{ padding: '0.1rem 0.5rem', background: 'rgba(254,243,199,0.7)', color: '#92400e', borderRadius: '9999px', fontSize: '0.6875rem', fontWeight: 600 }}>Featured</span>}
+        </div>
+        <h3 style={{ margin: '0 0 0.25rem', fontSize: '1rem', fontWeight: 600, color: 'var(--color-text)', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{project.title}</h3>
+        <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--color-text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{project.description}</p>
+      </div>
+
+      <svg style={{ flexShrink: 0, color: 'var(--color-text-muted)', opacity: hovered ? 1 : 0.4, transition: 'opacity 0.15s' }}
+        width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+      </svg>
     </a>
   );
 }

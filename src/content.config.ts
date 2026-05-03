@@ -50,6 +50,10 @@ const music = defineCollection({
     tags: z.array(z.string()).default([]),
     color: z.string().optional(),
     accent: z.string().optional(),
+    image: z.string().optional(),
+    spotifyUrl: z.string().optional(),
+    appleMusicUrl: z.string().optional(),
+    youtubeUrl: z.string().optional(),
   }),
 });
 

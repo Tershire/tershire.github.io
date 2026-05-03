@@ -13,6 +13,7 @@ export const projects: Project[] = [
     featured: true,
     link: '/projects/tfp-slam',
     codeLink: 'https://github.com/Tershire/AQUA-SLAM/tree/migration/ros2',
+    image: '/images/projects/orb_odom_path_compare_all.png',
   },
   // {
   //   slug: 'neural-occupancy',

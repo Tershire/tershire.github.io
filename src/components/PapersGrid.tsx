@@ -13,6 +13,7 @@ export interface Paper {
   codeLink?: string;
   projectLink?: string;
   award?: string;
+  image?: string;
 }
 
 const TYPE_COLORS: Record<Paper['type'], { bg: string; text: string }> = {
@@ -186,6 +187,10 @@ function PaperRow({ paper, expanded, onToggle }: { paper: Paper; expanded: boole
         onClick={onToggle}
         style={{ padding: '1.25rem 1.5rem', cursor: 'pointer', display: 'flex', alignItems: 'flex-start', gap: '1rem' }}
       >
+        {paper.image && (
+          <img src={paper.image} alt={paper.title}
+            style={{ width: '56px', height: '56px', objectFit: 'cover', borderRadius: '0.5rem', flexShrink: 0 }} />
+        )}
         <div style={{ flex: 1 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.375rem', flexWrap: 'wrap' }}>
             <span style={{ background: col.bg, color: col.text, padding: '0.1rem 0.625rem', borderRadius: '9999px', fontSize: '0.6875rem', fontWeight: 600 }}>
@@ -235,18 +240,25 @@ function PaperCard({ paper }: { paper: Paper }) {
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      style={{ background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: '1rem', padding: '1.25rem', display: 'flex', flexDirection: 'column', boxShadow: hovered ? '0 6px 20px rgba(0,0,0,0.12)' : '0 1px 3px rgba(0,0,0,0.06)', transform: hovered ? 'translateY(-2px)' : 'none', transition: 'all 0.2s' }}
+      style={{ background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: '1rem', overflow: 'hidden', display: 'flex', flexDirection: 'column', boxShadow: hovered ? '0 6px 20px rgba(0,0,0,0.12)' : '0 1px 3px rgba(0,0,0,0.06)', transform: hovered ? 'translateY(-2px)' : 'none', transition: 'all 0.2s' }}
     >
-      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.625rem', flexWrap: 'wrap' }}>
-        <span style={{ background: col.bg, color: col.text, padding: '0.1rem 0.5rem', borderRadius: '9999px', fontSize: '0.6875rem', fontWeight: 600 }}>{TYPE_LABELS[paper.type]}</span>
-        <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{paper.year}</span>
-      </div>
-      <h3 style={{ margin: '0 0 0.5rem', fontSize: '0.9375rem', fontWeight: 600, color: 'var(--color-text)', lineHeight: 1.4, flex: 1 }}>{paper.title}</h3>
-      <p style={{ margin: '0 0 0.5rem', fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>{paper.venue}</p>
-      <p style={{ margin: '0 0 0.875rem', fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>{paper.authors.slice(0,3).join(', ')}{paper.authors.length > 3 ? ' et al.' : ''}</p>
-      <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap' }}>
-        {paper.pdfLink && <a href={paper.pdfLink} target="_blank" rel="noopener" style={{ padding: '0.25rem 0.75rem', background: 'var(--color-accent)', color: 'white', borderRadius: '0.375rem', fontSize: '0.75rem', fontWeight: 500, textDecoration: 'none' }}>PDF</a>}
-        {paper.codeLink && <a href={paper.codeLink} target="_blank" rel="noopener" style={{ padding: '0.25rem 0.75rem', background: 'var(--color-code-bg)', color: 'var(--color-text)', borderRadius: '0.375rem', fontSize: '0.75rem', fontWeight: 500, textDecoration: 'none' }}>Code</a>}
+      {paper.image && (
+        <div style={{ height: '140px', overflow: 'hidden', flexShrink: 0 }}>
+          <img src={paper.image} alt={paper.title} style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.3s', transform: hovered ? 'scale(1.04)' : 'scale(1)' }} />
+        </div>
+      )}
+      <div style={{ padding: '1.25rem', display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.625rem', flexWrap: 'wrap' }}>
+          <span style={{ background: col.bg, color: col.text, padding: '0.1rem 0.5rem', borderRadius: '9999px', fontSize: '0.6875rem', fontWeight: 600 }}>{TYPE_LABELS[paper.type]}</span>
+          <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{paper.year}</span>
+        </div>
+        <h3 style={{ margin: '0 0 0.5rem', fontSize: '0.9375rem', fontWeight: 600, color: 'var(--color-text)', lineHeight: 1.4, flex: 1 }}>{paper.title}</h3>
+        <p style={{ margin: '0 0 0.5rem', fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>{paper.venue}</p>
+        <p style={{ margin: '0 0 0.875rem', fontSize: '0.8125rem', color: 'var(--color-text-muted)' }}>{paper.authors.slice(0,3).join(', ')}{paper.authors.length > 3 ? ' et al.' : ''}</p>
+        <div style={{ display: 'flex', gap: '0.375rem', flexWrap: 'wrap' }}>
+          {paper.pdfLink && <a href={paper.pdfLink} target="_blank" rel="noopener" style={{ padding: '0.25rem 0.75rem', background: 'var(--color-accent)', color: 'white', borderRadius: '0.375rem', fontSize: '0.75rem', fontWeight: 500, textDecoration: 'none' }}>PDF</a>}
+          {paper.codeLink && <a href={paper.codeLink} target="_blank" rel="noopener" style={{ padding: '0.25rem 0.75rem', background: 'var(--color-code-bg)', color: 'var(--color-text)', borderRadius: '0.375rem', fontSize: '0.75rem', fontWeight: 500, textDecoration: 'none' }}>Code</a>}
+        </div>
       </div>
     </div>
   );

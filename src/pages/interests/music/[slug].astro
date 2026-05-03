@@ -1,6 +1,10 @@
 ---
 import { getCollection, render } from 'astro:content';
 import ArticleLayout from '../../../layouts/ArticleLayout.astro';
+import YouTube from '../../../components/YouTube.astro';
+import YouTubePlaylist from '../../../components/YouTubePlaylist.astro';
+import SpotifyEmbed from '../../../components/SpotifyEmbed.astro';
+import AppleMusicEmbed from '../../../components/AppleMusicEmbed.astro';
 
 export async function getStaticPaths() {
   const entries = await getCollection('music');
@@ -65,7 +69,7 @@ const releaseFormatted = new Date(entry.data.releaseDate).toLocaleDateString('en
     <p style="font-size:0.75rem;color:var(--color-text-muted);margin:1rem 0 0;">Released {releaseFormatted}</p>
   </div>
 
-  <Content />
+  <Content components={{ YouTube, YouTubePlaylist, SpotifyEmbed, AppleMusicEmbed }} />
 </ArticleLayout>
 
 <style>

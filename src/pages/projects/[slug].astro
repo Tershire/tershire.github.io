@@ -2,6 +2,10 @@
 import { getCollection, render } from 'astro:content';
 import ArticleLayout from '../../layouts/ArticleLayout.astro';
 import { projects as projectData } from '../../data/projects';
+import YouTube from '../../components/YouTube.astro';
+import YouTubePlaylist from '../../components/YouTubePlaylist.astro';
+import SpotifyEmbed from '../../components/SpotifyEmbed.astro';
+import AppleMusicEmbed from '../../components/AppleMusicEmbed.astro';
 
 export async function getStaticPaths() {
   const entries = await getCollection('projects');
@@ -35,7 +39,7 @@ const meta = projectData.find(p => p.slug === entry.id);
     </a>
   </div>
 
-  <Content />
+  <Content components={{ YouTube, YouTubePlaylist, SpotifyEmbed, AppleMusicEmbed }} />
 
   <!-- External links from data -->
   {meta && (meta.codeLink || meta.paperLink) && (

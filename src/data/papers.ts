@@ -15,6 +15,7 @@ export const papers: Paper[] = [
     codeLink: 'https://github.com/tershire/vi-slam-legged',
     projectLink: '/projects/tfp-slam-',
     award: 'Best Paper Finalist',
+    image: '/images/projects/orb_odom_path_compare_all.png',
   },
   // {
   //   slug: 'neural-occ',

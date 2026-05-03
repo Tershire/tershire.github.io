@@ -1,25 +1,20 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
+import BlogGrid from '../../components/BlogGrid';
+import type { BlogPost } from '../../components/BlogGrid';
 
-const posts = (await getCollection('blog')).sort(
-  (a, b) => new Date(b.data.date).valueOf() - new Date(a.data.date).valueOf()
-);
-
-const TAG_COLORS: Record<string, string> = {
-  SLAM: '#dbeafe:#1d4ed8',
-  Robotics: '#d1fae5:#065f46',
-  Tutorial: '#fef3c7:#92400e',
-  Photography: '#fce7f3:#be185d',
-  Film: '#fef3c7:#d97706',
-  Hobby: '#f3e8ff:#7c3aed',
-};
-
-function tagStyle(tag: string) {
-  const pair = TAG_COLORS[tag] ?? '#f3f4f6:#374151';
-  const [bg, text] = pair.split(':');
-  return `background:${bg};color:${text};`;
-}
+const entries = await getCollection('blog');
+const posts: BlogPost[] = entries
+  .sort((a, b) => new Date(b.data.date).valueOf() - new Date(a.data.date).valueOf())
+  .map(entry => ({
+    slug: entry.id,
+    title: entry.data.title,
+    description: entry.data.description,
+    date: entry.data.date,
+    tags: entry.data.tags ?? [],
+    image: entry.data.image,
+  }));
 ---
 
 <BaseLayout title="Blog" description="Writing on robotics, research, and life outside the lab.">
@@ -35,48 +30,6 @@ function tagStyle(tag: string) {
       </p>
     </div>
 
-    <div style="display:flex;flex-direction:column;gap:1.5rem;max-width:680px;">
-      {posts.map(post => {
-        const date = new Date(post.data.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-        return (
-          <a
-            href={`/blog/${post.id}`}
-            style="display:block;text-decoration:none;background:var(--color-card);border:1px solid var(--color-border);border-radius:1rem;padding:1.75rem;transition:all 0.2s;"
-            class="blog-card"
-          >
-            {post.data.tags && (
-              <div style="display:flex;flex-wrap:wrap;gap:0.375rem;margin-bottom:0.875rem;">
-                {post.data.tags.map((tag: string) => (
-                  <span style={`padding:0.15rem 0.625rem;border-radius:9999px;font-size:0.6875rem;font-weight:500;${tagStyle(tag)}`}>
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            )}
-            <h2 style="margin:0 0 0.625rem;font-size:1.1875rem;font-weight:700;color:var(--color-text);line-height:1.35;">
-              {post.data.title}
-            </h2>
-            {post.data.description && (
-              <p style="margin:0 0 1rem;font-size:0.9375rem;color:var(--color-text-muted);line-height:1.6;">
-                {post.data.description}
-              </p>
-            )}
-            <div style="display:flex;align-items:center;justify-content:space-between;">
-              <span style="font-size:0.8125rem;color:var(--color-text-muted);">{date}</span>
-              <svg style="color:var(--color-text-muted);" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-              </svg>
-            </div>
-          </a>
-        );
-      })}
-    </div>
+    <BlogGrid posts={posts} client:load />
   </div>
 </BaseLayout>
-
-<style>
-  .blog-card:hover {
-    box-shadow: 0 6px 20px rgba(0,0,0,0.09);
-    transform: translateY(-2px);
-  }
-</style>
