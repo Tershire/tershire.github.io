@@ -79,7 +79,7 @@ import FloatingStats from '../components/FloatingStats';
   </div>
 
   <!-- Left side panel -->
-  <aside style="position:fixed;left:0;top:0;bottom:0;z-index:40;width:17rem;background:rgba(0,0,0,0.55);backdrop-filter:blur(20px);border-right:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;">
+  <aside id="home-aside" style="position:fixed;left:0;top:0;bottom:0;z-index:40;width:17rem;background:rgba(0,0,0,0.55);backdrop-filter:blur(20px);border-right:1px solid rgba(255,255,255,0.1);display:flex;flex-direction:column;">
     <!-- Profile -->
     <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:3rem 2rem;text-align:center;">
       <!-- Avatar -->
@@ -142,7 +142,7 @@ import FloatingStats from '../components/FloatingStats';
   </aside>
 
   <!-- Main content -->
-  <div style="margin-left:17rem;height:100vh;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:0 5rem;color:white;">
+  <div id="home-main" style="margin-left:17rem;height:100vh;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;padding:0 5rem;color:white;">
     <div style="max-width:32rem;">
       <p style="color:rgba(255,255,255,0.45);font-size:0.75rem;font-weight:600;letter-spacing:0.15em;text-transform:uppercase;margin:0 0 1rem;">Welcome</p>
       <h2 style="font-size:3.5rem;font-weight:800;line-height:1.1;margin:0 0 1.5rem;letter-spacing:-0.02em;">
@@ -169,6 +169,29 @@ import FloatingStats from '../components/FloatingStats';
 </BaseLayout>
 
 <style>
+  /* Mobile: hide sidebar, full-width main content */
+  @media (max-width: 767px) {
+    #home-aside { display: none !important; }
+    #home-main {
+      margin-left: 0 !important;
+      padding: 80px 1.75rem 3rem !important;
+      height: auto !important;
+      min-height: 100vh;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+    #home-main > div {
+      max-width: 100% !important;
+      text-align: center;
+    }
+    #home-main h2 {
+      font-size: 2.75rem !important;
+    }
+    #home-main > div > div:last-child {
+      justify-content: center;
+    }
+  }
+
   /* Dropdown: light mode */
   .nav-dropdown-menu {
     background: rgba(255, 255, 255, 0.97);
