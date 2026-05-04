@@ -3,7 +3,7 @@ import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
 
 const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
 const WEBSITE_ID = '5979ffcd-d67f-45c4-8f87-941ee6f62d04';
-const API_BASE = 'https://api.umami.is/v1/eu';
+const API_BASE = 'https://api.umami.is/v1';
 const API_KEY = 'api_UwYR1MkHGa3nEt9n6QILummwH5SjCN5t';
 
 // ISO 3166-1 alpha-2 → UN M.49 numeric (used by world-atlas TopoJSON)
@@ -57,7 +57,7 @@ export default function StatsMap() {
     const headers = { 'x-umami-api-key': API_KEY };
 
     Promise.all([
-      fetch(`${API_BASE}/websites/${WEBSITE_ID}/metrics?type=country&startAt=${startAt}&endAt=${endAt}&limit=200`, { headers })
+      fetch(`${API_BASE}/websites/${WEBSITE_ID}/metrics?type=country&startAt=${startAt}&endAt=${endAt}`, { headers })
         .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
       fetch(`${API_BASE}/websites/${WEBSITE_ID}/stats?startAt=${startAt}&endAt=${endAt}`, { headers })
         .then(r => r.ok ? r.json() : null).catch(() => null),
