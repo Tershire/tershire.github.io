@@ -3,8 +3,9 @@ import { NAV_LINKS, SITE } from '../data/site';
 
 interface Props {
   transparent?: boolean;
+  noLogo?: boolean;
 }
-const { transparent = false } = Astro.props;
+const { transparent = false, noLogo = false } = Astro.props;
 const pathname = Astro.url.pathname;
 ---
 
@@ -19,9 +20,10 @@ const pathname = Astro.url.pathname;
 >
   <div class="page-container h-full flex items-center justify-between">
     <!-- Logo -->
-    <a href="/" class="text-white font-semibold text-lg tracking-wide hover:opacity-80 transition-opacity">
-      {SITE.name}
-    </a>
+    {noLogo
+      ? <div></div>
+      : <a href="/" class="text-white font-semibold text-lg tracking-wide hover:opacity-80 transition-opacity">{SITE.name}</a>
+    }
 
     <!-- Desktop nav links + theme toggle -->
     <div class="hidden md:flex items-center gap-1">

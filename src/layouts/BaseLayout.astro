@@ -10,6 +10,7 @@ interface Props {
   transparentNav?: boolean;
   noNav?: boolean;
   noPadding?: boolean;
+  noLogo?: boolean;
 }
 
 const {
@@ -19,6 +20,7 @@ const {
   transparentNav = false,
   noNav = false,
   noPadding = false,
+  noLogo = false,
 } = Astro.props;
 
 const pageTitle = title ? `${title} · ${SITE.name}` : SITE.name;
@@ -69,7 +71,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     />
   </head>
   <body>
-    {!noNav && <Nav transparent={transparentNav} />}
+    {!noNav && <Nav transparent={transparentNav} noLogo={noLogo} />}
     <main class:list={[!noPadding && !noNav && 'pt-[52px]']}>
       <slot />
     </main>
