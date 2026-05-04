@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { ComposableMap, Geographies, Geography } from 'react-simple-maps';
 
 const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
+const WEBSITE_ID = '5979ffcd-d67f-45c4-8f87-941ee6f62d04';
+const API_BASE = 'https://api.umami.is/v1/eu';
+const API_KEY = 'api_UwYR1MkHGa3nEt9n6QILummwH5SjCN5t';
 
 // ISO 3166-1 alpha-2 → UN M.49 numeric (used by world-atlas TopoJSON)
 const A2_TO_NUM: Record<string, number> = {
@@ -27,82 +30,59 @@ const A2_TO_NUM: Record<string, number> = {
   WS:882,YE:887,ZA:710,ZM:894,ZW:716,
 };
 
-interface LocationStat {
-  id: string;
-  name: string;
-  count: number;
-  count_unique?: number;
-}
+// Country code → name fallback
+const A2_NAME: Record<string, string> = {
+  KR:'South Korea',US:'United States',JP:'Japan',CN:'China',GB:'United Kingdom',
+  DE:'Germany',FR:'France',CA:'Canada',AU:'Australia',IN:'India',BR:'Brazil',
+  NL:'Netherlands',SE:'Sweden',SG:'Singapore',CH:'Switzerland',NO:'Norway',
+  FI:'Finland',DK:'Denmark',IT:'Italy',ES:'Spain',PL:'Poland',RU:'Russia',
+  TR:'Turkey',TW:'Taiwan',HK:'Hong Kong',ID:'Indonesia',TH:'Thailand',VN:'Vietnam',
+  MY:'Malaysia',NZ:'New Zealand',IE:'Ireland',AT:'Austria',BE:'Belgium',PT:'Portugal',
+};
 
-interface Tooltip {
-  name: string;
-  count: number;
-  x: number;
-  y: number;
-}
-
-const SITE = 'https://tershire.goatcounter.com';
-const TOKEN_KEY = 'gc_api_token';
+interface CountryStat { code: string; name: string; count: number; }
+interface Tooltip { name: string; count: number; x: number; y: number; }
 
 export default function StatsMap() {
-  const [stats, setStats] = useState<LocationStat[]>([]);
+  const [countries, setCountries] = useState<CountryStat[]>([]);
+  const [totalViews, setTotalViews] = useState(0);
+  const [totalVisitors, setTotalVisitors] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [errorDetail, setErrorDetail] = useState<string | null>(null);
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
-  const [token, setToken] = useState<string>('');
-  const [showTokenInput, setShowTokenInput] = useState(false);
 
-  function loadData(apiToken: string | null = null) {
-    setLoading(true);
-    setError(null);
-    setErrorDetail(null);
+  useEffect(() => {
+    const startAt = new Date('2024-01-01').getTime();
+    const endAt = Date.now();
+    const headers = { 'x-umami-api-key': API_KEY };
 
-    const today = new Date().toISOString().slice(0, 10);
-    const url = `${SITE}/api/v0/stats/locations?period-start=2024-01-01&period-end=${today}&limit=200`;
-    const headers: Record<string, string> = {};
-    if (apiToken) headers['Authorization'] = `Bearer ${apiToken}`;
-
-    fetch(url, { headers })
-      .then(async r => {
-        if (!r.ok) {
-          const body = await r.text().catch(() => '');
-          throw new Error(`HTTP ${r.status}|${body}`);
+    Promise.all([
+      fetch(`${API_BASE}/websites/${WEBSITE_ID}/metrics?type=country&startAt=${startAt}&endAt=${endAt}&limit=200`, { headers })
+        .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); }),
+      fetch(`${API_BASE}/websites/${WEBSITE_ID}/stats?startAt=${startAt}&endAt=${endAt}`, { headers })
+        .then(r => r.ok ? r.json() : null).catch(() => null),
+    ])
+      .then(([metricsData, statsData]) => {
+        const list: CountryStat[] = (metricsData as { x: string; y: number }[]).map(d => ({
+          code: d.x.toUpperCase(),
+          name: A2_NAME[d.x.toUpperCase()] ?? d.x,
+          count: d.y,
+        }));
+        setCountries(list);
+        if (statsData) {
+          setTotalViews(statsData.pageviews?.value ?? 0);
+          setTotalVisitors(statsData.visitors?.value ?? 0);
         }
-        return r.json();
-      })
-      .then(data => {
-        setStats((data.stats ?? []) as LocationStat[]);
         setLoading(false);
       })
       .catch(err => {
-        const parts = (err.message as string).split('|');
-        setError(parts[0]);
-        setErrorDetail(parts[1] ?? null);
+        setError(err.message);
         setLoading(false);
       });
-  }
-
-  useEffect(() => {
-    const saved = localStorage.getItem(TOKEN_KEY);
-    if (saved) setToken(saved);
-    loadData(saved || null);
   }, []);
 
-  function handleTokenSubmit(e: React.SyntheticEvent) {
-    e.preventDefault();
-    const t = token.trim();
-    if (t) localStorage.setItem(TOKEN_KEY, t);
-    else localStorage.removeItem(TOKEN_KEY);
-    setShowTokenInput(false);
-    loadData(t || null);
-  }
-
-  // Only use 2-letter country codes (not sub-regions like "KR-11")
-  const countryStats = stats.filter(s => s.id && s.id.length === 2);
-  const numToStat = new Map(countryStats.map(s => [A2_TO_NUM[s.id.toUpperCase()], s]));
-  const maxCount = Math.max(...countryStats.map(s => s.count), 1);
-  const total = stats.reduce((sum, s) => sum + s.count, 0);
+  const numToStat = new Map(countries.map(c => [A2_TO_NUM[c.code], c]));
+  const maxCount = Math.max(...countries.map(c => c.count), 1);
 
   function countryColor(numericId: number, hover = false): string {
     const stat = numToStat.get(numericId);
@@ -112,7 +92,7 @@ export default function StatsMap() {
     return `rgba(79,124,172,${alpha.toFixed(2)})`;
   }
 
-  const topCountries = [...countryStats].sort((a, b) => b.count - a.count).slice(0, 10);
+  const topCountries = [...countries].sort((a, b) => b.count - a.count).slice(0, 10);
 
   if (loading) {
     return (
@@ -125,56 +105,9 @@ export default function StatsMap() {
   if (error) {
     return (
       <div style={{ padding: '2.5rem', textAlign: 'center' }}>
-        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9375rem', marginBottom: '0.5rem' }}>
-          Could not load analytics data ({error}).
+        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9375rem' }}>
+          Could not load analytics ({error}).
         </p>
-        {errorDetail && (
-          <p style={{ color: 'var(--color-text-muted)', fontSize: '0.75rem', fontFamily: 'monospace', marginBottom: '1rem', opacity: 0.7 }}>
-            {errorDetail.slice(0, 300)}
-          </p>
-        )}
-        <p style={{ color: 'var(--color-text-muted)', fontSize: '0.8125rem', lineHeight: 1.7, marginBottom: '1.25rem' }}>
-          GoatCounter 대시보드를 <strong style={{ color: 'var(--color-text)' }}>Viewable by: Everyone</strong>으로 설정하거나,<br />
-          API 토큰을 입력해 주세요.
-        </p>
-
-        {showTokenInput ? (
-          <form onSubmit={handleTokenSubmit} style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <input
-              type="text"
-              value={token}
-              onChange={e => setToken(e.target.value)}
-              placeholder="GoatCounter API token"
-              autoFocus
-              style={{
-                padding: '0.5rem 0.875rem',
-                borderRadius: '0.5rem',
-                border: '1px solid var(--color-border)',
-                background: 'var(--color-code-bg)',
-                color: 'var(--color-text)',
-                fontSize: '0.875rem',
-                minWidth: '260px',
-                outline: 'none',
-              }}
-            />
-            <button type="submit" style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', background: 'var(--color-accent)', color: '#fff', border: 'none', fontSize: '0.875rem', cursor: 'pointer', fontWeight: 600 }}>
-              Load
-            </button>
-          </form>
-        ) : (
-          <button
-            onClick={() => setShowTokenInput(true)}
-            style={{ padding: '0.5rem 1.25rem', borderRadius: '0.5rem', border: '1px solid var(--color-border)', background: 'transparent', color: 'var(--color-text-muted)', fontSize: '0.8125rem', cursor: 'pointer' }}
-          >
-            Enter API token
-          </button>
-        )}
-
-        <div style={{ marginTop: '1rem' }}>
-          <a href={SITE} target="_blank" rel="noopener" style={{ fontSize: '0.8125rem', color: 'var(--color-accent)' }}>
-            Open GoatCounter →
-          </a>
-        </div>
       </div>
     );
   }
@@ -182,46 +115,25 @@ export default function StatsMap() {
   return (
     <div style={{ position: 'relative' }}>
       {/* Summary */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.75rem', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.75rem', flexWrap: 'wrap' }}>
         {[
-          { label: 'Total views', value: total.toLocaleString() },
-          { label: 'Countries', value: countryStats.length.toString() },
+          { label: 'Page views', value: totalViews.toLocaleString() },
+          { label: 'Visitors', value: totalVisitors.toLocaleString() },
+          { label: 'Countries', value: countries.length.toString() },
         ].map(item => (
           <div key={item.label} style={{ background: 'var(--color-code-bg)', borderRadius: '0.75rem', padding: '0.875rem 1.25rem', minWidth: '110px' }}>
             <div style={{ fontSize: '1.375rem', fontWeight: 700, color: 'var(--color-text)', lineHeight: 1 }}>{item.value}</div>
             <div style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '0.25rem' }}>{item.label}</div>
           </div>
         ))}
-        <button
-          onClick={() => setShowTokenInput(v => !v)}
-          style={{ marginLeft: 'auto', padding: '0.4rem 0.75rem', borderRadius: '0.5rem', border: '1px solid var(--color-border)', background: 'transparent', color: 'var(--color-text-muted)', fontSize: '0.75rem', cursor: 'pointer' }}
-        >
-          {showTokenInput ? 'Cancel' : 'API token'}
-        </button>
       </div>
-
-      {showTokenInput && (
-        <form onSubmit={handleTokenSubmit} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1.25rem', flexWrap: 'wrap' }}>
-          <input
-            type="text"
-            value={token}
-            onChange={e => setToken(e.target.value)}
-            placeholder="GoatCounter API token (saved in localStorage)"
-            autoFocus
-            style={{ flex: 1, padding: '0.5rem 0.875rem', borderRadius: '0.5rem', border: '1px solid var(--color-border)', background: 'var(--color-code-bg)', color: 'var(--color-text)', fontSize: '0.875rem', minWidth: '200px', outline: 'none' }}
-          />
-          <button type="submit" style={{ padding: '0.5rem 1rem', borderRadius: '0.5rem', background: 'var(--color-accent)', color: '#fff', border: 'none', fontSize: '0.875rem', cursor: 'pointer', fontWeight: 600 }}>
-            Load
-          </button>
-        </form>
-      )}
 
       {/* World map */}
       <div style={{ background: 'var(--color-code-bg)', borderRadius: '1rem', overflow: 'hidden', marginBottom: '2rem' }}>
         <ComposableMap projectionConfig={{ scale: 147, center: [10, 10] }} style={{ width: '100%', height: 'auto', display: 'block' }}>
           <Geographies geography={GEO_URL}>
-            {({ geographies }: { geographies: { id: string; rsmKey: string; [key: string]: unknown }[] }) =>
-              geographies.map((geo: { id: string; rsmKey: string; [key: string]: unknown }) => {
+            {({ geographies }: { geographies: { id: string; rsmKey: string; [k: string]: unknown }[] }) =>
+              geographies.map((geo: { id: string; rsmKey: string; [k: string]: unknown }) => {
                 const numId = parseInt(geo.id);
                 const stat = numToStat.get(numId);
                 return (
@@ -259,7 +171,7 @@ export default function StatsMap() {
           </h3>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
             {topCountries.map((c, i) => (
-              <div key={c.id} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+              <div key={c.code} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                 <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', width: '1.25rem', textAlign: 'right', flexShrink: 0 }}>{i + 1}</span>
                 <span style={{ fontSize: '0.8125rem', color: 'var(--color-text)', width: '9rem', flexShrink: 0 }}>{c.name}</span>
                 <div style={{ flex: 1, height: '6px', background: 'var(--color-border)', borderRadius: '3px', overflow: 'hidden' }}>
@@ -274,13 +186,12 @@ export default function StatsMap() {
         </div>
       )}
 
-      {stats.length === 0 && (
+      {countries.length === 0 && (
         <p style={{ textAlign: 'center', color: 'var(--color-text-muted)', fontSize: '0.875rem', padding: '2rem' }}>
           No visitor data yet.
         </p>
       )}
 
-      {/* Tooltip */}
       {tooltip && (
         <div style={{ position: 'fixed', left: tooltip.x + 14, top: tooltip.y - 36, background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: '0.5rem', padding: '0.4rem 0.875rem', fontSize: '0.8125rem', pointerEvents: 'none', zIndex: 9999, boxShadow: '0 4px 16px rgba(0,0,0,0.15)', whiteSpace: 'nowrap' }}>
           <span style={{ fontWeight: 600, color: 'var(--color-text)' }}>{tooltip.name}</span>

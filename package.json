@@ -27,5 +27,8 @@
     "rehype-katex": "^7.0.1",
     "remark-math": "^6.0.0",
     "tailwindcss": "^4.2.4"
+  },
+  "devDependencies": {
+    "@types/react-simple-maps": "^3.0.6"
   }
 }
