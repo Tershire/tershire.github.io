@@ -129,7 +129,7 @@ export default function StatsMap() {
       </div>
 
       {/* World map */}
-      <div style={{ background: 'var(--color-code-bg)', borderRadius: '1rem', overflow: 'hidden', marginBottom: '2rem' }}>
+      <div style={{ background: 'var(--color-code-bg)', borderRadius: '1rem', overflow: 'hidden', marginBottom: '2rem', '--map-stroke': 'rgba(140,140,140,0.5)' } as React.CSSProperties}>
         <ComposableMap projectionConfig={{ scale: 147, center: [10, 10] }} style={{ width: '100%', height: 'auto', display: 'block' }}>
           <Geographies geography={GEO_URL}>
             {({ geographies }: { geographies: { id: string; rsmKey: string; [k: string]: unknown }[] }) =>
@@ -141,8 +141,8 @@ export default function StatsMap() {
                     key={geo.rsmKey}
                     geography={geo}
                     fill={countryColor(numId)}
-                    stroke="var(--color-border)"
-                    strokeWidth={0.4}
+                    stroke="var(--map-stroke)"
+                    strokeWidth={0.6}
                     onMouseEnter={(e: React.MouseEvent) => {
                       if (stat) setTooltip({ name: stat.name, count: stat.count, x: e.clientX, y: e.clientY });
                     }}

@@ -102,10 +102,15 @@ const pathname = Astro.url.pathname;
       <button
         id="mobile-menu-btn"
         class="text-white/80 hover:text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
-        aria-label="Open menu"
+        aria-label="Toggle menu"
       >
-        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <!-- Hamburger (default) -->
+        <svg id="menu-icon-bars" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <!-- X (when open) -->
+        <svg id="menu-icon-x" class="w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
     </div>
@@ -185,9 +190,24 @@ const pathname = Astro.url.pathname;
   const menu = document.getElementById('mobile-menu');
   const overlay = document.getElementById('mobile-overlay');
   const close = document.getElementById('mobile-close');
-  function openMenu() { menu?.classList.remove('hidden'); }
-  function closeMenu() { menu?.classList.add('hidden'); }
-  btn?.addEventListener('click', openMenu);
+  const iconBars = document.getElementById('menu-icon-bars');
+  const iconX = document.getElementById('menu-icon-x');
+
+  function openMenu() {
+    menu?.classList.remove('hidden');
+    iconBars?.classList.add('hidden');
+    iconX?.classList.remove('hidden');
+  }
+  function closeMenu() {
+    menu?.classList.add('hidden');
+    iconBars?.classList.remove('hidden');
+    iconX?.classList.add('hidden');
+  }
+  function toggleMenu() {
+    menu?.classList.contains('hidden') ? openMenu() : closeMenu();
+  }
+
+  btn?.addEventListener('click', toggleMenu);
   close?.addEventListener('click', closeMenu);
   overlay?.addEventListener('click', closeMenu);
 
