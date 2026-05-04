@@ -1,0 +1,21 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import StatsMap from '../components/StatsMap';
+---
+
+<BaseLayout title="Analytics" description="Site visitor analytics">
+  <div class="page-container py-16">
+
+    <div style="margin-bottom:2.5rem;">
+      <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:0.75rem;">
+        <div style="width:3px;height:2rem;background:linear-gradient(180deg,var(--color-accent),var(--color-accent-light));border-radius:9999px;"></div>
+        <p style="font-size:0.75rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--color-text-muted);margin:0;">Site</p>
+      </div>
+      <h1 class="section-title">Analytics</h1>
+      <p class="section-subtitle">Who's been stopping by.</p>
+    </div>
+
+    <StatsMap client:load />
+
+  </div>
+</BaseLayout>
