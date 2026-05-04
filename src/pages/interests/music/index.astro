@@ -15,11 +15,21 @@ function youtubeVideoId(url: string): string | null {
 }
 
 function extractYouTubeIdFromBody(body: string): string | null {
-  const urlMatch = body.match(/<YouTube[^>]+url="([^"]+)"/);
-  if (urlMatch) return youtubeVideoId(urlMatch[1]);
+  const urlMatch = body.match(/<YouTubePlaylist[^>]+url="([^"]+)"|<YouTube[^>]+url="([^"]+)"/);
+  if (urlMatch) return youtubeVideoId(urlMatch[1] ?? urlMatch[2]);
   const idMatch = body.match(/<YouTube[^>]+id="([^"]+)"/);
   if (idMatch) return idMatch[1];
   return null;
+}
+
+function extractSpotifyUrlFromBody(body: string): string | null {
+  const match = body.match(/<SpotifyEmbed[^>]+url="([^"]+)"/);
+  return match ? match[1] : null;
+}
+
+function extractAppleMusicUrlFromBody(body: string): string | null {
+  const match = body.match(/<AppleMusicEmbed[^>]+url="([^"]+)"/);
+  return match ? match[1] : null;
 }
 
 async function resolveImage(data: typeof entries[0]['data'], body: string): Promise<string | undefined> {
@@ -46,7 +56,27 @@ async function resolveImage(data: typeof entries[0]['data'], body: string): Prom
     const vid = youtubeVideoId(data.youtubeUrl);
     if (vid) return `https://img.youtube.com/vi/${vid}/maxresdefault.jpg`;
   }
-  // Auto-detect YouTube component from article body
+  // Auto-detect embed components from article body
+  const spotifyUrl = extractSpotifyUrlFromBody(body);
+  if (spotifyUrl) {
+    try {
+      const res = await fetch(`https://open.spotify.com/oembed?url=${encodeURIComponent(spotifyUrl)}`);
+      if (res.ok) {
+        const oembed = await res.json() as { thumbnail_url?: string };
+        if (oembed.thumbnail_url) return oembed.thumbnail_url;
+      }
+    } catch {}
+  }
+  const appleMusicUrl = extractAppleMusicUrlFromBody(body);
+  if (appleMusicUrl) {
+    try {
+      const res = await fetch(`https://music.apple.com/oembed?url=${encodeURIComponent(appleMusicUrl)}`);
+      if (res.ok) {
+        const oembed = await res.json() as { thumbnail_url?: string };
+        if (oembed.thumbnail_url) return oembed.thumbnail_url;
+      }
+    } catch {}
+  }
   const vid = extractYouTubeIdFromBody(body);
   if (vid) return `https://img.youtube.com/vi/${vid}/maxresdefault.jpg`;
   return undefined;
