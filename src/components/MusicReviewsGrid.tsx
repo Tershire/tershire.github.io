@@ -1,4 +1,5 @@
 import { useState, useMemo } from 'react';
+import MusicMap, { type MapCountry } from './MusicMap';
 
 export interface MusicReview {
   slug: string;
@@ -108,16 +109,24 @@ export default function MusicReviewsGrid({ reviews }: { reviews: MusicReview[] }
     return true;
   }).sort((a, b) => new Date(b.releaseDate).valueOf() - new Date(a.releaseDate).valueOf()), [reviews, yearRange, selectedTypes, selectedCountries, search]);
 
-  const countryStats = useMemo(() => {
-    const counts: Record<string, { country: string; flag: string; countryCode: string; count: number }> = {};
+  const mapCountries = useMemo((): MapCountry[] => {
+    const total: Record<string, { country: string; flag: string; count: number }> = {};
+    const filteredCounts: Record<string, number> = {};
     reviews.forEach(r => {
-      if (!counts[r.countryCode]) counts[r.countryCode] = { country: r.country, flag: r.flag, countryCode: r.countryCode, count: 0 };
-      counts[r.countryCode].count++;
+      if (!total[r.countryCode]) total[r.countryCode] = { country: r.country, flag: r.flag, count: 0 };
+      total[r.countryCode].count++;
     });
-    return Object.values(counts).sort((a, b) => b.count - a.count);
-  }, [reviews]);
-
-  const maxCount = countryStats.length > 0 ? countryStats[0].count : 1;
+    filtered.forEach(r => {
+      filteredCounts[r.countryCode] = (filteredCounts[r.countryCode] ?? 0) + 1;
+    });
+    return Object.entries(total).map(([code, info]) => ({
+      countryCode: code,
+      country: info.country,
+      flag: info.flag,
+      totalCount: info.count,
+      filteredCount: filteredCounts[code] ?? 0,
+    }));
+  }, [reviews, filtered]);
 
   const years = useMemo(
     () => Array.from({ length: maxYear - minYear + 1 }, (_, i) => minYear + i),
@@ -170,41 +179,12 @@ export default function MusicReviewsGrid({ reviews }: { reviews: MusicReview[] }
           )}
         </div>
 
-      {/* Country distribution */}
-      {countryStats.length > 0 && (
-        <div style={{ background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: '1rem', padding: '1rem 1.25rem', marginBottom: '1.25rem' }}>
-          <p style={{ fontSize: '0.6875rem', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--color-text-muted)', margin: '0 0 0.75rem' }}>By Country</p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-            {countryStats.map(stat => {
-              const intensity = stat.count / maxCount;
-              const isSelected = selectedCountries.has(stat.countryCode);
-              return (
-                <button
-                  key={stat.countryCode}
-                  onClick={() => toggleCountry(stat.countryCode)}
-                  style={{
-                    display: 'inline-flex', alignItems: 'center', gap: '0.375rem',
-                    padding: '0.3rem 0.75rem', borderRadius: '9999px', fontSize: '0.8125rem', fontWeight: 500,
-                    background: isSelected
-                      ? `rgba(79,124,172,${0.2 + intensity * 0.5})`
-                      : `rgba(79,124,172,${0.06 + intensity * 0.18})`,
-                    border: `2px solid ${isSelected ? 'var(--color-accent)' : 'transparent'}`,
-                    color: isSelected ? 'var(--color-accent)' : 'var(--color-text)',
-                    cursor: 'pointer', transition: 'all 0.15s',
-                  }}
-                >
-                  <span>{stat.flag}</span>
-                  <span>{stat.country}</span>
-                  <span style={{ fontSize: '0.6875rem', opacity: 0.65 }}>({stat.count})</span>
-                </button>
-              );
-            })}
-            {selectedCountries.size > 0 && (
-              <button onClick={() => setSelectedCountries(new Set())} style={{ padding: '0.3rem 0.75rem', borderRadius: '9999px', fontSize: '0.8125rem', color: '#ef4444', background: 'rgba(254,226,226,0.5)', border: 'none', cursor: 'pointer' }}>Clear</button>
-            )}
-          </div>
-        </div>
-      )}
+      {/* Country map */}
+      <MusicMap
+        countries={mapCountries}
+        selectedCountries={selectedCountries}
+        onToggleCountry={toggleCountry}
+      />
 
       {/* Timeline */}
       <div style={{ background: 'var(--color-card)', border: '1px solid var(--color-border)', borderRadius: '1rem', padding: '1.25rem 1.5rem', marginBottom: '2rem' }}>
