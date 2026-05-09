@@ -6,6 +6,7 @@ const TYPE_COLORS: Record<Hobby['type'], { bg: string; text: string }> = {
   tech:          { bg: 'rgba(219,234,254,0.7)', text: '#2563eb' },
   physical:      { bg: 'rgba(209,250,229,0.7)', text: '#059669' },
   art:           { bg: 'rgba(254,243,199,0.7)', text: '#d97706' },
+  game:          { bg: 'rgba(237,233,254,0.7)', text: '#7c3aed' },
   unclassified:  { bg: 'rgba(243,244,246,0.7)', text: '#6b7280' },
 };
 

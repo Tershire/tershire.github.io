@@ -2,6 +2,18 @@ import type { Paper } from '../components/PapersGrid';
 
 export const papers: Paper[] = [
   {
+    slug: 'thesis',
+    title: 'My Thesis Title',
+    authors: ['Tershire'],
+    venue: 'Korea University',
+    year: 2025,
+    type: 'thesis',
+    abstract: '',
+    tags: [],
+    pdfLink: 'https://drive.google.com/file/d/1AA_fLbJcYALVqL33Ewld0egKKVECrQu1/view?usp=drive_link',
+    driveEmbedId: '1AA_fLbJcYALVqL33Ewld0egKKVECrQu1',
+  },
+  {
     slug: 'tfp-slam-',
     title: 'Robust Visual-Inertial Odometry for Legged Robots on Rough Terrain',
     authors: ['Tershire', 'J. Kim', 'S. Park'],

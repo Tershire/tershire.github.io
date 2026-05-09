@@ -2,7 +2,7 @@ export interface Hobby {
   slug: string;
   name: string;
   emoji: string;
-  type: 'tech' | 'physical' | 'art' | 'unclassified';
+  type: 'tech' | 'physical' | 'art' | 'game' | 'unclassified';
   startYear: number;
   endYear: number | null;
   description: string;
@@ -15,6 +15,21 @@ export interface Hobby {
 }
 
 export const hobbies: Hobby[] = [
+  {
+    slug: 'park_sim_game',
+    name: 'Amusement Park Simulation Games',
+    emoji: '🎢',
+    type: 'game',
+    startYear: 2010,
+    endYear: null,
+    color: 'rgba(65, 0, 78, 0.7)',
+    accent: '#8b8b8b',
+    description: "Architecture & Engineering.",
+    highlights: ['RCT3', 'PC', 'PC2'],
+    hasDetail: false,
+    // image: '/images/hobbies/park_sim_game.webp',
+    // imagePosition: 'bottom',
+  },
   {
     slug: 'boxing',
     name: 'Boxing',
@@ -51,5 +66,6 @@ export const TYPE_LABELS: Record<Hobby['type'], string> = {
   tech: 'Tech',
   physical: 'Physical',
   art: 'Art',
+  game: 'Game',
   unclassified: 'Unclassified',
 };

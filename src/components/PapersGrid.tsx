@@ -8,10 +8,11 @@ export interface Paper {
   year: number;
   abstract: string;
   tags: string[];
-  type: 'conference' | 'journal' | 'workshop' | 'preprint';
+  type: 'conference' | 'journal' | 'workshop' | 'preprint' | 'thesis';
   pdfLink?: string;
   codeLink?: string;
   projectLink?: string;
+  driveEmbedId?: string;
   award?: string;
   image?: string;
 }
@@ -21,6 +22,7 @@ const TYPE_COLORS: Record<Paper['type'], { bg: string; text: string }> = {
   journal:    { bg: 'rgba(209,250,229,0.7)', text: '#059669' },
   workshop:   { bg: 'rgba(254,243,199,0.7)', text: '#d97706' },
   preprint:   { bg: 'rgba(243,232,255,0.7)', text: '#7c3aed' },
+  thesis:     { bg: 'rgba(255,228,230,0.7)', text: '#be123c' },
 };
 
 const TYPE_LABELS: Record<Paper['type'], string> = {
@@ -28,6 +30,7 @@ const TYPE_LABELS: Record<Paper['type'], string> = {
   journal: 'Journal',
   workshop: 'Workshop',
   preprint: 'Preprint',
+  thesis: 'Thesis',
 };
 
 const MIN_YEAR = 2018;
@@ -227,6 +230,17 @@ function PaperRow({ paper, expanded, onToggle }: { paper: Paper; expanded: boole
             {paper.codeLink && <a href={paper.codeLink} target="_blank" rel="noopener" style={{ padding: '0.375rem 1rem', background: 'var(--color-code-bg)', color: 'var(--color-text)', borderRadius: '0.5rem', fontSize: '0.8125rem', fontWeight: 500, textDecoration: 'none' }}>Code</a>}
             {paper.projectLink && <a href={paper.projectLink} target="_blank" rel="noopener" style={{ padding: '0.375rem 1rem', background: 'rgba(79,124,172,0.12)', color: 'var(--color-accent)', borderRadius: '0.5rem', fontSize: '0.8125rem', fontWeight: 500, textDecoration: 'none' }}>Project Page</a>}
           </div>
+          {paper.driveEmbedId && (
+            <div style={{ marginTop: '1.25rem', borderRadius: '0.625rem', overflow: 'hidden', border: '1px solid var(--color-border)' }}>
+              <iframe
+                src={`https://drive.google.com/file/d/${paper.driveEmbedId}/preview`}
+                width="100%"
+                height="600"
+                allow="autoplay"
+                style={{ display: 'block', border: 'none' }}
+              />
+            </div>
+          )}
         </div>
       )}
     </div>
