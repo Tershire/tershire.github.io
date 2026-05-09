@@ -187,55 +187,59 @@ const pathname = Astro.url.pathname;
 </div>
 
 <script>
-  // Mobile menu
-  const btn = document.getElementById('mobile-menu-btn');
-  const menu = document.getElementById('mobile-menu');
-  const overlay = document.getElementById('mobile-overlay');
-  const close = document.getElementById('mobile-close');
-  const iconBars = document.getElementById('menu-icon-bars');
-  const iconX = document.getElementById('menu-icon-x');
+  function initNav() {
+    // Mobile menu
+    const btn = document.getElementById('mobile-menu-btn');
+    const menu = document.getElementById('mobile-menu');
+    const overlay = document.getElementById('mobile-overlay');
+    const close = document.getElementById('mobile-close');
+    const iconBars = document.getElementById('menu-icon-bars');
+    const iconX = document.getElementById('menu-icon-x');
 
-  function openMenu() {
-    menu?.classList.remove('hidden');
-    iconBars?.classList.add('hidden');
-    iconX?.classList.remove('hidden');
-  }
-  function closeMenu() {
-    menu?.classList.add('hidden');
-    iconBars?.classList.remove('hidden');
-    iconX?.classList.add('hidden');
-  }
-  function toggleMenu() {
-    menu?.classList.contains('hidden') ? openMenu() : closeMenu();
-  }
+    function openMenu() {
+      menu?.classList.remove('hidden');
+      iconBars?.classList.add('hidden');
+      iconX?.classList.remove('hidden');
+    }
+    function closeMenu() {
+      menu?.classList.add('hidden');
+      iconBars?.classList.remove('hidden');
+      iconX?.classList.add('hidden');
+    }
+    function toggleMenu() {
+      menu?.classList.contains('hidden') ? openMenu() : closeMenu();
+    }
 
-  btn?.addEventListener('click', toggleMenu);
-  close?.addEventListener('click', closeMenu);
-  overlay?.addEventListener('click', closeMenu);
+    btn?.addEventListener('click', toggleMenu);
+    close?.addEventListener('click', closeMenu);
+    overlay?.addEventListener('click', closeMenu);
 
-  // Theme toggle
-  function isDark() {
-    return document.documentElement.getAttribute('data-theme') === 'dark';
-  }
+    // Theme toggle
+    function isDark() {
+      return document.documentElement.getAttribute('data-theme') === 'dark';
+    }
 
-  function syncIcons() {
-    const dark = isDark();
-    document.getElementById('icon-sun')?.classList.toggle('hidden', !dark);
-    document.getElementById('icon-moon')?.classList.toggle('hidden', dark);
-    document.getElementById('icon-sun-m')?.classList.toggle('hidden', !dark);
-    document.getElementById('icon-moon-m')?.classList.toggle('hidden', dark);
-  }
+    function syncIcons() {
+      const dark = isDark();
+      document.getElementById('icon-sun')?.classList.toggle('hidden', !dark);
+      document.getElementById('icon-moon')?.classList.toggle('hidden', dark);
+      document.getElementById('icon-sun-m')?.classList.toggle('hidden', !dark);
+      document.getElementById('icon-moon-m')?.classList.toggle('hidden', dark);
+    }
 
-  function toggleTheme() {
-    const next = isDark() ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('theme', next);
+    function toggleTheme() {
+      const next = isDark() ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      syncIcons();
+    }
+
+    document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
+    document.getElementById('theme-toggle-mobile')?.addEventListener('click', toggleTheme);
+
     syncIcons();
   }
 
-  document.getElementById('theme-toggle')?.addEventListener('click', toggleTheme);
-  document.getElementById('theme-toggle-mobile')?.addEventListener('click', toggleTheme);
-
-  // Sync icons on load
-  syncIcons();
+  // Run on initial load and after every client-side navigation
+  document.addEventListener('astro:page-load', initNav);
 </script>
