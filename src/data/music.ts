@@ -101,7 +101,7 @@ export const favoriteArtists: Artist[] = [
     description: '',
     color: 'rgba(202, 202, 202, 0.6)',
     accent: '#414141e1',
-    keyWorks: ['Snow White and the Seven Dwarfs'],
+    keyWorks: ['Snow White & the Seven Dwarfs'],
     image: '/images/artists/churchill.webp',
   },
   {

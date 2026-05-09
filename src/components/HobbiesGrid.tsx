@@ -2,12 +2,13 @@ import { useState, useMemo } from 'react';
 import type { Hobby } from '../data/hobbies';
 import { TYPE_LABELS } from '../data/hobbies';
 
+const NC = { bg: 'rgba(79,124,172,0.12)', text: '#4f7cac' };
 const TYPE_COLORS: Record<Hobby['type'], { bg: string; text: string }> = {
-  tech:          { bg: 'rgba(219,234,254,0.7)', text: '#2563eb' },
-  physical:      { bg: 'rgba(209,250,229,0.7)', text: '#059669' },
-  art:           { bg: 'rgba(254,243,199,0.7)', text: '#d97706' },
-  game:          { bg: 'rgba(237,233,254,0.7)', text: '#7c3aed' },
-  unclassified:  { bg: 'rgba(243,244,246,0.7)', text: '#6b7280' },
+  tech:          NC,
+  physical:      NC,
+  art:           NC,
+  game:          NC,
+  unclassified:  NC,
 };
 
 const MIN_YEAR = 2010;

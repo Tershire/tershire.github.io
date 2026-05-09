@@ -17,12 +17,13 @@ export interface Paper {
   image?: string;
 }
 
+const NC = { bg: 'rgba(79,124,172,0.12)', text: '#4f7cac' };
 const TYPE_COLORS: Record<Paper['type'], { bg: string; text: string }> = {
-  conference: { bg: 'rgba(219,234,254,0.7)', text: '#1d4ed8' },
-  journal:    { bg: 'rgba(209,250,229,0.7)', text: '#059669' },
-  workshop:   { bg: 'rgba(254,243,199,0.7)', text: '#d97706' },
-  preprint:   { bg: 'rgba(243,232,255,0.7)', text: '#7c3aed' },
-  thesis:     { bg: 'rgba(255,228,230,0.7)', text: '#be123c' },
+  conference: NC,
+  journal:    NC,
+  workshop:   NC,
+  preprint:   NC,
+  thesis:     NC,
 };
 
 const TYPE_LABELS: Record<Paper['type'], string> = {

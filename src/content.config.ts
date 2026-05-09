@@ -40,7 +40,7 @@ const music = defineCollection({
   schema: z.object({
     title: z.string(),
     artist: z.string(),
-    type: z.enum(['album', 'EP', 'single', 'track', 'compilation']),
+    type: z.enum(['album', 'EP', 'single', 'track', 'compilation', 'live']),
     releaseDate: z.string(),
     country: z.string(),
     countryCode: z.string(),

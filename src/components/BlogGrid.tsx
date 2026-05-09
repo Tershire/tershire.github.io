@@ -10,18 +10,8 @@ export interface BlogPost {
   readingTime?: number;
 }
 
-const TAG_COLORS: Record<string, { bg: string; text: string }> = {
-  SLAM:        { bg: '#dbeafe', text: '#1d4ed8' },
-  Robotics:    { bg: '#d1fae5', text: '#065f46' },
-  Tutorial:    { bg: '#fef3c7', text: '#92400e' },
-  Photography: { bg: '#fce7f3', text: '#be185d' },
-  Film:        { bg: '#fef3c7', text: '#d97706' },
-  Hobby:       { bg: '#f3e8ff', text: '#7c3aed' },
-};
-
-function tagStyle(tag: string): { background: string; color: string } {
-  const col = TAG_COLORS[tag] ?? { bg: '#f3f4f6', text: '#374151' };
-  return { background: col.bg, color: col.text };
+function tagStyle(_tag: string): { background: string; color: string } {
+  return { background: 'rgba(79,124,172,0.12)', color: '#4f7cac' };
 }
 
 interface Props {

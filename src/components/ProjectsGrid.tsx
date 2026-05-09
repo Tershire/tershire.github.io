@@ -22,11 +22,12 @@ const TYPE_LABELS: Record<Project['type'], string> = {
   'open-source': 'Open Source',
 };
 
+const NC = { bg: 'rgba(79,124,172,0.12)', text: '#4f7cac' };
 const TYPE_COLORS: Record<Project['type'], { bg: string; text: string }> = {
-  academic:      { bg: 'rgba(219,234,254,0.7)', text: '#1d4ed8' },
-  personal:      { bg: 'rgba(209,250,229,0.7)', text: '#065f46' },
-  collaborative: { bg: 'rgba(254,243,199,0.7)', text: '#92400e' },
-  'open-source': { bg: 'rgba(243,232,255,0.7)', text: '#6d28d9' },
+  academic:      NC,
+  personal:      NC,
+  collaborative: NC,
+  'open-source': NC,
 };
 
 const MIN_YEAR = 2015;
@@ -184,7 +185,7 @@ function ProjectCard({ project }: { project: Project }) {
       <div style={{ padding: '1.25rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
         <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '0.5rem', marginBottom: '0.5rem' }}>
           <h3 style={{ margin: 0, fontSize: '1rem', fontWeight: 600, color: 'var(--color-text)', lineHeight: 1.3 }}>{project.title}</h3>
-          {project.featured && <span style={{ flexShrink: 0, padding: '0.1rem 0.5rem', background: 'rgba(254,243,199,0.7)', color: '#92400e', borderRadius: '9999px', fontSize: '0.6875rem', fontWeight: 600 }}>Featured</span>}
+          {project.featured && <span style={{ flexShrink: 0, padding: '0.1rem 0.5rem', background: 'rgba(251,146,60,0.15)', color: '#ea6c00', borderRadius: '9999px', fontSize: '0.6875rem', fontWeight: 600 }}>Featured</span>}
         </div>
         <p style={{ margin: '0 0 0.875rem', fontSize: '0.875rem', color: 'var(--color-text-muted)', lineHeight: 1.6, flex: 1 }}>{project.description}</p>
         <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.375rem', marginBottom: '1rem' }}>
@@ -235,7 +236,7 @@ function ProjectRow({ project }: { project: Project }) {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.25rem', flexWrap: 'wrap' }}>
           <span style={{ background: col.bg, color: col.text, padding: '0.1rem 0.5rem', borderRadius: '9999px', fontSize: '0.6875rem', fontWeight: 600 }}>{TYPE_LABELS[project.type]}</span>
           <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>{project.startYear}–{project.endYear ?? 'Now'}</span>
-          {project.featured && <span style={{ padding: '0.1rem 0.5rem', background: 'rgba(254,243,199,0.7)', color: '#92400e', borderRadius: '9999px', fontSize: '0.6875rem', fontWeight: 600 }}>Featured</span>}
+          {project.featured && <span style={{ padding: '0.1rem 0.5rem', background: 'rgba(251,146,60,0.15)', color: '#ea6c00', borderRadius: '9999px', fontSize: '0.6875rem', fontWeight: 600 }}>Featured</span>}
         </div>
         <h3 style={{ margin: '0 0 0.25rem', fontSize: '1rem', fontWeight: 600, color: 'var(--color-text)', lineHeight: 1.3, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{project.title}</h3>
         <p style={{ margin: 0, fontSize: '0.8125rem', color: 'var(--color-text-muted)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{project.description}</p>

@@ -4,7 +4,7 @@ export interface MusicReview {
   slug: string;
   title: string;
   artist: string;
-  type: 'album' | 'EP' | 'single' | 'track' | 'compilation';
+  type: 'album' | 'EP' | 'single' | 'track' | 'compilation' | 'live';
   releaseDate: string;
   country: string;
   countryCode: string;
@@ -26,14 +26,17 @@ const TYPE_LABELS: Record<MusicReview['type'], string> = {
   single: 'Single',
   track: 'Track',
   compilation: 'Compilation',
+  live: 'Live',
 };
 
+const NC = { bg: 'rgba(79,124,172,0.12)', text: '#4f7cac' };
 const TYPE_COLORS: Record<MusicReview['type'], { bg: string; text: string }> = {
-  album:       { bg: 'rgba(219,234,254,0.7)', text: '#1d4ed8' },
-  EP:          { bg: 'rgba(209,250,229,0.7)', text: '#059669' },
-  single:      { bg: 'rgba(254,243,199,0.7)', text: '#d97706' },
-  track:       { bg: 'rgba(243,232,255,0.7)', text: '#7c3aed' },
-  compilation: { bg: 'rgba(243,244,246,0.7)', text: '#4b5563' },
+  album:       NC,
+  EP:          NC,
+  single:      NC,
+  track:       NC,
+  compilation: NC,
+  live:        NC,
 };
 
 function releaseYear(r: MusicReview) {
